@@ -219,6 +219,24 @@ pub enum PerformanceLevel {
     Unknown = 0x100,
 }
 
+
+impl ToString for PerformanceLevel {
+    fn to_string(&self) -> String {
+        match self {
+            PerformanceLevel::Auto => "performance level: Auto".to_owned(),
+            PerformanceLevel::Low => "performance level: Low".to_owned(),
+            PerformanceLevel::High => "performance level: High".to_owned(),
+            PerformanceLevel::Manual => "performance level: Manual".to_owned(),
+            PerformanceLevel::StableStd => "performance level: Stable Std".to_owned(),
+            PerformanceLevel::StablePeak => "performance level: Stable Peak".to_owned(),
+            PerformanceLevel::StableMinMclk => "performance level: Stable Min MClk".to_owned(),
+            PerformanceLevel::StableMinSclk => "performance level: Stable Min SClk".to_owned(),
+            PerformanceLevel::Determinism => "performance level: Determinism".to_owned(),
+            PerformanceLevel::Unknown => "performance level: Unknown".to_owned(),
+        }
+    }
+}
+
 #[repr(C)]
 #[derive(Default)]
 pub struct RsmiFrequenciesT {
