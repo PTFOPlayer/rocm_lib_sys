@@ -2,7 +2,7 @@
 name = "rocm_lib_sys"
 version = "0.1.0"
 edition = "2021"
-license = "MIT or Apache-2.0"
+license = "MIT OR Apache-2.0"
 authors = ["WhiskyAKM"]
 description = "bindings for rocm_smi_lib"
 repository = "https://github.com/PTFOPlayer/rocm_smi_lib"
