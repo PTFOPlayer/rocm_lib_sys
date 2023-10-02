@@ -21,16 +21,8 @@ extern "C" {
     pub fn rsmi_dev_name_get(dv_ind: u32, name: *mut i8, name_length: usize) -> RocmErr;
     pub fn rsmi_dev_vendor_id_get(dv_ind: u32, id: *mut u16) -> RocmErr;
     pub fn rsmi_dev_brand_get(dv_ind: u32, brand: *mut i8, name_length: usize) -> RocmErr;
-    pub fn rsmi_dev_vendor_name_get(
-        dv_ind: u32,
-        vendor: *mut i8,
-        name_length: usize,
-    ) -> RocmErr;
-    pub fn rsmi_dev_vram_vendor_get(
-        dv_ind: u32,
-        vendor: *mut i8,
-        name_length: usize,
-    ) -> RocmErr;
+    pub fn rsmi_dev_vendor_name_get(dv_ind: u32, vendor: *mut i8, name_length: usize) -> RocmErr;
+    pub fn rsmi_dev_vram_vendor_get(dv_ind: u32, vendor: *mut i8, name_length: usize) -> RocmErr;
     pub fn rsmi_dev_serial_number_get(
         dv_ind: u32,
         serial_number: *mut i8,
@@ -43,18 +35,12 @@ extern "C" {
         name_length: usize,
     ) -> RocmErr;
     pub fn rsmi_dev_drm_render_minor_get(dv_ind: u32, render_minor: *mut u32) -> RocmErr;
-    pub fn rsmi_dev_subsystem_vendor_id_get(
-        dv_ind: u32,
-        subsystem_vendor_id: *mut u16,
-    ) -> RocmErr;
+    pub fn rsmi_dev_subsystem_vendor_id_get(dv_ind: u32, subsystem_vendor_id: *mut u16) -> RocmErr;
     pub fn rsmi_dev_unique_id_get(dv_ind: u32, unique_id: *mut u64) -> RocmErr;
 
     // pcie
 
-    pub fn rsmi_dev_pci_bandwidth_get(
-        dv_ind: u32,
-        bandwidth: *mut RsmiPcieBandwidthT,
-    ) -> RocmErr;
+    pub fn rsmi_dev_pci_bandwidth_get(dv_ind: u32, bandwidth: *mut RsmiPcieBandwidthT) -> RocmErr;
     pub fn rsmi_dev_pci_id_get(dv_ind: u32, id: *mut u64) -> RocmErr;
     pub fn rsmi_topo_numa_affinity_get(dv_ind: u32, numa: *mut u32) -> RocmErr;
     pub fn rsmi_dev_pci_throughput_get(
@@ -91,11 +77,7 @@ extern "C" {
     //physical
     pub fn rsmi_dev_fan_rpms_get(dv_ind: u32, sensor: u32, rpm: *mut i64) -> RocmErr;
     pub fn rsmi_dev_fan_speed_get(dv_ind: u32, sensor: u32, speed: *mut i64) -> RocmErr;
-    pub fn rsmi_dev_fan_speed_max_get(
-        dv_ind: u32,
-        sensor: u32,
-        speed_max: *mut u64,
-    ) -> RocmErr;
+    pub fn rsmi_dev_fan_speed_max_get(dv_ind: u32, sensor: u32, speed_max: *mut u64) -> RocmErr;
     pub fn rsmi_dev_temp_metric_get(
         dv_ind: u32,
         sensor: RsmiTemperatureSensor,
@@ -123,13 +105,39 @@ extern "C" {
         clk_type: RsmiClkType,
         clk: *mut RsmiFrequenciesT,
     ) -> RocmErr;
-
     pub fn rsmi_dev_overdrive_level_get(dv_ind: u32, level: *mut u32) -> RocmErr;
     pub fn rsmi_dev_mem_overdrive_level_get(dv_ind: u32, level: *mut u32) -> RocmErr;
-
     pub fn rsmi_dev_od_volt_info_get(dv_ind: u32, ov_volt: *mut RsmiOdVoltFreqDataT) -> RocmErr;
-
     pub fn rsmi_dev_gpu_metrics_info_get(dv_ind: u32, metrics: *mut GpuMetrics) -> RocmErr;
+
+    //version
+    pub fn rsmi_version_get(version: *mut RsmiVersion) -> RocmErr;
+    pub fn rsmi_version_str_get(
+        component: RsmiSwComponentT,
+        ver_str: *mut i8,
+        length: u32,
+    ) -> RocmErr;
+    pub fn rsmi_dev_vbios_version_get(dv_ind: u32, vbios: *mut i8, length: u32) -> RocmErr;
+    pub fn rsmi_dev_firmware_version_get(
+        dv_ind: u32,
+        block: RsmiFwBlockT,
+        version: *mut u64,
+    ) -> RocmErr;
+
+    //error
+    pub fn rsmi_dev_ecc_count_get(
+        dv_ind: u32,
+        block: RsmiGpuBlockT,
+        ec: *mut RsmiErrorCountT,
+    ) -> RocmErr;
+    pub fn rsmi_dev_ecc_enabled_get(dv_ind: u32, enablet_bits: u64) -> RocmErr;
+    pub fn rsmi_dev_ecc_status_get(
+        dv_ind: u32,
+        block: RsmiGpuBlockT,
+        state: *mut RsmiRasErrStateT,
+    ) -> RocmErr;
+    pub fn rsmi_status_string(status: RocmErr, status_string: *mut *const i8);
+
 }
 
 #[repr(C)]
@@ -219,6 +227,67 @@ pub enum PerformanceLevel {
     Unknown = 0x100,
 }
 
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub enum RsmiFwBlockT {
+    RsmiFwBlockAsd,
+    RsmiFwBlockCe,
+    RsmiFwBlockDmcu,
+    RsmiFwBlockMc,
+    RsmiFwBlockMe,
+    RsmiFwBlockMec,
+    RsmiFwBlockMec2,
+    RsmiFwBlockPfp,
+    RsmiFwBlockRlc,
+    RsmiFwBlockRlcSrlc,
+    RsmiFwBlockRlcSrlg,
+    RsmiFwBlockRlcSrls,
+    RsmiFwBlockSdma,
+    RsmiFwBlockSdma2,
+    RsmiFwBlockSmc,
+    RsmiFwBlockSos,
+    RsmiFwBlockTaRas,
+    RsmiFwBlockTaXgmi,
+    RsmiFwBlockUvd,
+    RsmiFwBlockVce,
+    RsmiFwBlockVcn,
+}
+
+#[allow(conflicting_repr_hints)]
+#[repr(usize)]
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub enum RsmiGpuBlockT {
+    RsmiGpuBlockInvalid = 0x0000000000000000,
+    RsmiGpuBlockUmc = 0x0000000000000001,
+    RsmiGpuBlockSdma = 0x0000000000000002,
+    RsmiGpuBlockGfx = 0x0000000000000004,
+    RsmiGpuBlockMmhub = 0x0000000000000008,
+    RsmiGpuBlockAthub = 0x0000000000000010,
+    RsmiGpuBlockPcieBif = 0x0000000000000020,
+    RsmiGpuBlockHdp = 0x0000000000000040,
+    RsmiGpuBlockXgmiWafl = 0x0000000000000080,
+    RsmiGpuBlockDf = 0x0000000000000100,
+    RsmiGpuBlockSmn = 0x0000000000000200,
+    RsmiGpuBlockSem = 0x0000000000000400,
+    RsmiGpuBlockMp0 = 0x0000000000000800,
+    RsmiGpuBlockMp1 = 0x0000000000001000,
+    RsmiGpuBlockFuse = 0x0000000000002000,
+    RsmiGpuBlockReserved = 0x8000000000000000,
+}
+
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub enum RsmiRasErrStateT {
+    RsmiRasErrStateNone = 0,
+    RsmiRasErrStateDisabled,
+    RsmiRasErrStateParity,
+    RsmiRasErrStateSingC,
+    RsmiRasErrStateMultUc,
+    RsmiRasErrStatePoison,
+    RsmiRasErrStateEnabled,
+    RsmiRasErrStateInvalid = 0xFFFFFFFF,
+}
 
 impl ToString for PerformanceLevel {
     fn to_string(&self) -> String {
@@ -238,6 +307,12 @@ impl ToString for PerformanceLevel {
 }
 
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub enum RsmiSwComponentT {
+    RsmiSwCompDriver,
+}
+
+#[repr(C)]
 #[derive(Default)]
 pub struct RsmiFrequenciesT {
     pub num_supported: u32,
@@ -251,7 +326,6 @@ pub struct RsmiPcieBandwidthT {
     pub transfer_rate: RsmiFrequenciesT,
     pub lanes: [u32; RSMI_MAX_NUM_FREQUENCIES],
 }
-
 
 #[repr(C)]
 #[derive(Debug, Default, Clone)]
@@ -362,6 +436,22 @@ pub struct RsmiOdVoltFreqDataT {
     pub mclk_freq_limits: RsmiRange,
     pub curve: RsmiOdVoltCurveT,
     pub num_regions: u32,
+}
+
+#[repr(C)]
+#[derive(Debug)]
+pub struct RsmiVersion {
+    pub major: u32,
+    pub minor: u32,
+    pub patch: u32,
+    pub build: *mut i8,
+}
+
+#[repr(C)]
+#[derive(Debug)]
+pub struct RsmiErrorCountT {
+    pub correctable_err: u64,
+    pub uncorrectable_err: u64,
 }
 
 #[inline(always)]

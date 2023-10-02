@@ -3,23 +3,24 @@ pub mod error;
 
 #[cfg(test)]
 mod test {
-    use crate::{
-        bindings::{rsmi_dev_brand_get, rsmi_init, rsmi_shut_down},
-        error::RocmErr,
-    };
+    use std::mem::size_of;
+
+    use crate::{bindings::*, error::RocmErr};
 
     #[test]
-    fn minor_test() {
-        let ret = unsafe { rsmi_init(0) };
-        assert_eq!(ret, RocmErr::RsmiStatusSuccess);
+    fn minor_test() -> Result<(), RocmErr> {
+        unsafe {
+            rsmi_init(0).try_err()?;
 
-        let buff = unsafe { libc::malloc(64).cast() };
-        let ret = unsafe { rsmi_dev_brand_get(0, buff, 64) };
-        assert_eq!(ret, RocmErr::RsmiStatusSuccess);
-        let temp = unsafe { std::ffi::CString::from_raw(buff) };
-        println!("{:?}", temp.to_string_lossy().to_string());
-    
-        let ret = unsafe { rsmi_shut_down() };
-        assert_eq!(ret, RocmErr::RsmiStatusSuccess)
+            let buff = libc::malloc(size_of::<i8>() * 64).cast();
+            rsmi_dev_brand_get(0, buff, 64).try_err()?;
+
+            let temp = std::ffi::CString::from_raw(buff);
+            println!("{:?}", temp.to_string_lossy().to_string());
+
+            rsmi_shut_down().try_err()?;
+        }
+
+        Ok(())
     }
 }
