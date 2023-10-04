@@ -20,7 +20,6 @@ mod test {
 
             rsmi_shut_down().try_err()?;
         }
-
         Ok(())
     }
 }
