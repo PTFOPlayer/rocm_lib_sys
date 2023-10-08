@@ -8,7 +8,7 @@ extern "C" {
         ver_str: *mut i8,
         length: u32,
     ) -> RocmErr;
-    pub fn rsmi_dev_vbios_version_get(dv_ind: u32, vbios: *mut i8, length: u32) -> RocmErr;
+    pub fn rsmi_dev_vbios_version_get(dv_ind: u32, vbios: *mut i8, length: usize) -> RocmErr;
     pub fn rsmi_dev_firmware_version_get(
         dv_ind: u32,
         block: RsmiFwBlockT,
@@ -17,7 +17,7 @@ extern "C" {
 }
 
 #[repr(C)]
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct RsmiVersion {
     pub major: u32,
     pub minor: u32,
@@ -55,4 +55,30 @@ pub enum RsmiFwBlockT {
     RsmiFwBlockUvd,
     RsmiFwBlockVce,
     RsmiFwBlockVcn,
+}
+
+impl RsmiFwBlockT {
+    pub fn enum_iterator() -> std::array::IntoIter<RsmiFwBlockT, 21>  {
+        [    RsmiFwBlockT::RsmiFwBlockAsd,
+        RsmiFwBlockT::RsmiFwBlockCe,
+        RsmiFwBlockT::RsmiFwBlockDmcu,
+        RsmiFwBlockT::RsmiFwBlockMc,
+        RsmiFwBlockT::RsmiFwBlockMe,
+        RsmiFwBlockT::RsmiFwBlockMec,
+        RsmiFwBlockT::RsmiFwBlockMec2,
+        RsmiFwBlockT::RsmiFwBlockPfp,
+        RsmiFwBlockT::RsmiFwBlockRlc,
+        RsmiFwBlockT::RsmiFwBlockRlcSrlc,
+        RsmiFwBlockT::RsmiFwBlockRlcSrlg,
+        RsmiFwBlockT::RsmiFwBlockRlcSrls,
+        RsmiFwBlockT::RsmiFwBlockSdma,
+        RsmiFwBlockT::RsmiFwBlockSdma2,
+        RsmiFwBlockT::RsmiFwBlockSmc,
+        RsmiFwBlockT::RsmiFwBlockSos,
+        RsmiFwBlockT::RsmiFwBlockTaRas,
+        RsmiFwBlockT::RsmiFwBlockTaXgmi,
+        RsmiFwBlockT::RsmiFwBlockUvd,
+        RsmiFwBlockT::RsmiFwBlockVce,
+        RsmiFwBlockT::RsmiFwBlockVcn].into_iter()
+    }
 }

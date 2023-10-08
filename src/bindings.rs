@@ -30,6 +30,11 @@ pub use version::*;
 pub mod error;
 pub use error::*;
 
+pub mod perf_counter;
+pub use perf_counter::*;
+
+pub mod sys_info;
+pub use sys_info::*;
 // #[link(name = "rsmi64", kind = "static")]
 // extern "C" {}
 
