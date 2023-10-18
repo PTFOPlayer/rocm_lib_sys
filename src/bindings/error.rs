@@ -13,7 +13,7 @@ extern "C" {
         block: RsmiGpuBlockT,
         state: *mut RsmiRasErrStateT,
     ) -> RocmErr;
-    pub fn rsmi_status_string(status: RocmErr, status_string: *mut *const i8);
+    pub fn rsmi_status_string(status: RocmErr, status_string: *mut *const i8) -> RocmErr;
 }
 
 #[allow(conflicting_repr_hints)]

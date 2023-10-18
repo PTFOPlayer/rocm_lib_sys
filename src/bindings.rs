@@ -35,6 +35,9 @@ pub use perf_counter::*;
 
 pub mod sys_info;
 pub use sys_info::*;
+
+pub mod topology;
+pub use topology::*;
 // #[link(name = "rsmi64", kind = "static")]
 // extern "C" {}
 
