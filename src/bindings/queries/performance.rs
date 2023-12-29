@@ -1,4 +1,4 @@
-use super::RsmiFrequenciesT;
+use crate::bindings::queries::pcie::RsmiFrequenciesT;
 use crate::error::RocmErr;
 
 pub const RSMI_NUM_VOLTAGE_CURVE_POINTS: usize = 3;

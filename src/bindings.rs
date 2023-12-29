@@ -3,41 +3,36 @@ use crate::error::RocmErr;
 // when determining fan speed percentage.
 pub const RSMI_MAX_FAN_SPEED: usize = 255;
 
-pub mod identifier;
+mod queries;
+mod functions;
 pub use identifier::*;
+pub use functions::*;
 
-pub mod init;
+use queries::*;
+
 pub use init::*;
 
-pub mod pcie;
 pub use pcie::*;
 
-pub mod power;
 pub use power::*;
 
-pub mod physical;
 pub use physical::*;
 
-pub mod memory;
 pub use memory::*;
 
-pub mod performance;
 pub use performance::*;
 
-pub mod version;
 pub use version::*;
 
-pub mod error;
 pub use error::*;
 
-pub mod perf_counter;
 pub use perf_counter::*;
 
-pub mod sys_info;
 pub use sys_info::*;
 
-pub mod topology;
 pub use topology::*;
+
+pub use supported_fn::*;
 // #[link(name = "rsmi64", kind = "static")]
 // extern "C" {}
 

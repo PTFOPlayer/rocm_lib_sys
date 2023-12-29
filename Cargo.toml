@@ -8,7 +8,6 @@ description = "bindings for rocm_smi_lib"
 repository = "https://github.com/PTFOPlayer/rocm_smi_lib"
 categories = ["api-bindings", "external-ffi-bindings", "hardware-support"]
 keywords = ["radeon", "rsmi", "hip", "rocm", "gpu"]
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 libc = "0.2.147"
