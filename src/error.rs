@@ -22,6 +22,7 @@ pub enum RocmErr {
     RsmiStatusSettingUnavailable,
     RsmiStatusAmdgpuRestartErr,
     RsmiStringConversionError,
+    RsmiLibLoadingError,
     RsmiStatusUnknownError = 0xFFFFFFFF,
 }
 
@@ -91,6 +92,13 @@ impl ToString for RocmErr {
             RocmErr::RsmiStatusAmdgpuRestartErr => "Rsmi status Amdgpu restart err (you probably need to reboot or load gpu driver again".to_owned(),
             RocmErr::RsmiStatusUnknownError => "Rsmi status unknown error".to_owned(),
             RocmErr::RsmiStringConversionError => "Rsmi status string conversion error (sorry you can not fix that on your own, create issue on github with info about your GPU)".to_owned(),
+            RocmErr::RsmiLibLoadingError => "Rsmi status library not found".to_owned(),
         }
+    }
+}
+
+impl From<libloading::Error> for RocmErr {
+    fn from(_value: libloading::Error) -> Self {
+        Self::RsmiLibLoadingError
     }
 }

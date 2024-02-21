@@ -9,7 +9,7 @@ mod test {
     #[test]
     fn minor_test() -> Result<(), RocmErr> {
         unsafe {
-            rsmi_init(0).try_err()?;
+            rsmi_init(0)?.try_err()?;
 
             let buff = libc::malloc(size_of::<i8>() * 64).cast();
             rsmi_dev_brand_get(0, buff, 64).try_err()?;
@@ -17,7 +17,7 @@ mod test {
             let temp = std::ffi::CString::from_raw(buff);
             println!("{:?}", temp.to_string_lossy().to_string());
 
-            rsmi_shut_down().try_err()?;
+            rsmi_shut_down()?.try_err()?;
         }
         Ok(())
     }
@@ -41,7 +41,7 @@ mod test {
     #[test]
     fn firmware() -> Result<(), RocmErr> {
         unsafe {
-            rsmi_init(0).try_err()?;
+            rsmi_init(0)?.try_err()?;
 
             let mut v = 0u64;
             for item in RsmiFwBlockT::enum_iterator() {
@@ -49,7 +49,7 @@ mod test {
                 println!("firmware version {:?}:{}", item, v);
             }
 
-            rsmi_shut_down().try_err()?;
+            rsmi_shut_down()?.try_err()?;
         }
 
         Ok(())
@@ -58,12 +58,12 @@ mod test {
     #[test]
     fn bios() -> Result<(), RocmErr> {
         unsafe {
-            rsmi_init(0).try_err()?;
+            rsmi_init(0)?.try_err()?;
 
             let data = string_from_fn(0, 128, rsmi_dev_vbios_version_get);
             println!("bios:{:?}", data);
 
-            rsmi_shut_down().try_err()?;
+            rsmi_shut_down()?.try_err()?;
         }
         Ok(())
     }
@@ -71,7 +71,7 @@ mod test {
     #[test]
     fn supported_fn() -> Result<(), RocmErr> {
         unsafe {
-            rsmi_init(0).try_err()?;
+            rsmi_init(0)?.try_err()?;
             let mut handle = RsmiFuncIdIterHandleT::new();
             let hdl_ptr = &mut handle as *mut RsmiFuncIdIterHandleT;
             rsmi_dev_supported_func_iterator_open(0, hdl_ptr).try_err()?;
