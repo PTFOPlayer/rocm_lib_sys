@@ -1,6 +1,5 @@
 pub mod error;
 pub mod identifier;
-pub mod init;
 pub mod memory;
 pub mod pcie;
 pub mod performance;

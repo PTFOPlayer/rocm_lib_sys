@@ -5,12 +5,12 @@ pub const RSMI_MAX_FAN_SPEED: usize = 255;
 
 mod queries;
 mod functions;
+
 pub use identifier::*;
+
 pub use functions::*;
 
 use queries::*;
-
-pub use init::*;
 
 pub use pcie::*;
 

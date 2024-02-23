@@ -21,6 +21,3 @@ opt-level = 1
 
 [profile.release]
 opt-level = 3
-
-[features]
-vendored = []
