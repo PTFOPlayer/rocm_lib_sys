@@ -1,4 +1,4 @@
-use crate::bindings::queries::pcie::RsmiFrequenciesT;
+use crate::bindings::queries::pcie::RsmiFrequencies;
 use crate::error::RocmErr;
 
 pub const RSMI_NUM_VOLTAGE_CURVE_POINTS: usize = 3;
@@ -11,18 +11,18 @@ extern "C" {
     pub fn rsmi_dev_perf_level_get(dv_ind: u32, level: *mut PerformanceLevel) -> RocmErr;
     pub fn rsmi_utilization_count_get(
         dv_ind: u32,
-        counter: *mut RsmiUtilizationCounterT,
+        counter: *mut RsmiUtilizationCounter,
         count: u32,
         timestamp: *mut u64,
     ) -> RocmErr;
     pub fn rsmi_dev_gpu_clk_freq_get(
         dv_ind: u32,
         clk_type: RsmiClkType,
-        clk: *mut RsmiFrequenciesT,
+        clk: *mut RsmiFrequencies,
     ) -> RocmErr;
     pub fn rsmi_dev_overdrive_level_get(dv_ind: u32, level: *mut u32) -> RocmErr;
     pub fn rsmi_dev_mem_overdrive_level_get(dv_ind: u32, level: *mut u32) -> RocmErr;
-    pub fn rsmi_dev_od_volt_info_get(dv_ind: u32, ov_volt: *mut RsmiOdVoltFreqDataT) -> RocmErr;
+    pub fn rsmi_dev_od_volt_info_get(dv_ind: u32, ov_volt: *mut RsmiOdVoltFreqData) -> RocmErr;
     pub fn rsmi_dev_gpu_metrics_info_get(dv_ind: u32, metrics: *mut GpuMetrics) -> RocmErr;
 }
 
@@ -61,19 +61,19 @@ pub enum RsmiClkType {
 
 #[repr(C)]
 #[derive(Debug, Clone)]
-pub struct RsmiUtilizationCounterT {
+pub struct RsmiUtilizationCounter {
     pub counter_type: RsmiUtilizationCounterType,
     pub value: u64,
 }
 
 #[repr(C)]
 #[derive(Debug, Default, Clone)]
-pub struct RsmiOdVoltFreqDataT {
+pub struct RsmiOdVoltFreqData {
     pub curr_sclk_range: RsmiRange,
     pub curr_mclk_range: RsmiRange,
     pub sclk_freq_limits: RsmiRange,
     pub mclk_freq_limits: RsmiRange,
-    pub curve: RsmiOdVoltCurveT,
+    pub curve: RsmiOdVoltCurve,
     pub num_regions: u32,
 }
 
@@ -93,7 +93,7 @@ pub struct RsmiOdVddcPoint {
 
 #[repr(C)]
 #[derive(Debug, Default, Clone)]
-pub struct RsmiOdVoltCurveT {
+pub struct RsmiOdVoltCurve {
     pub vc_points: [RsmiOdVddcPoint; RSMI_NUM_VOLTAGE_CURVE_POINTS],
 }
 

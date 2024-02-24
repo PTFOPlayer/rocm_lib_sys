@@ -19,6 +19,17 @@ impl RawRsmi {
         f(init_status).try_err()?;
         Ok(Self { path: PATH, lib })
     }
+
+    pub unsafe fn with_path(init_status: u32, path: &'static str) -> Result<RawRsmi, RocmErr> {
+        let lib = Library::new(path)?;
+        let f: Symbol<unsafe extern "C" fn(u32) -> RocmErr> = lib.get(b"rsmi_init")?;
+        f(init_status).try_err()?;
+        Ok(Self { path, lib })
+    }
+
+    pub fn get_path(&self) -> &'static str {
+        self.path
+    }
 }
 
 impl Drop for RawRsmi {
@@ -40,7 +51,7 @@ impl Drop for RawRsmi {
 
 #[cfg(test)]
 mod test {
-    use crate::{bindings::*, error::RocmErr, RawRsmi};
+    use crate::{error::RocmErr, RawRsmi};
     use std::mem::size_of;
 
     #[test]

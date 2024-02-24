@@ -4,14 +4,14 @@ use crate::error::RocmErr;
 extern "C" {
     pub fn rsmi_dev_ecc_count_get(
         dv_ind: u32,
-        block: RsmiGpuBlockT,
-        ec: *mut RsmiErrorCountT,
+        block: RsmiGpuBlock,
+        ec: *mut RsmiErrorCount,
     ) -> RocmErr;
     pub fn rsmi_dev_ecc_enabled_get(dv_ind: u32, enablet_bits: u64) -> RocmErr;
     pub fn rsmi_dev_ecc_status_get(
         dv_ind: u32,
-        block: RsmiGpuBlockT,
-        state: *mut RsmiRasErrStateT,
+        block: RsmiGpuBlock,
+        state: *mut RsmiRasErrState,
     ) -> RocmErr;
     pub fn rsmi_status_string(status: RocmErr, status_string: *mut *const i8) -> RocmErr;
 }
@@ -20,7 +20,7 @@ extern "C" {
 #[repr(usize)]
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum RsmiGpuBlockT {
+pub enum RsmiGpuBlock {
     RsmiGpuBlockInvalid = 0x0000000000000000,
     RsmiGpuBlockUmc = 0x0000000000000001,
     RsmiGpuBlockSdma = 0x0000000000000002,
@@ -41,7 +41,7 @@ pub enum RsmiGpuBlockT {
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum RsmiRasErrStateT {
+pub enum RsmiRasErrState {
     RsmiRasErrStateNone = 0,
     RsmiRasErrStateDisabled,
     RsmiRasErrStateParity,
@@ -54,7 +54,7 @@ pub enum RsmiRasErrStateT {
 
 #[repr(C)]
 #[derive(Debug)]
-pub struct RsmiErrorCountT {
+pub struct RsmiErrorCount {
     pub correctable_err: u64,
     pub uncorrectable_err: u64,
 }

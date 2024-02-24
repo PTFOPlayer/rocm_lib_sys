@@ -4,14 +4,14 @@ use crate::error::RocmErr;
 extern "C" {
     pub fn rsmi_version_get(version: *mut RsmiVersion) -> RocmErr;
     pub fn rsmi_version_str_get(
-        component: RsmiSwComponentT,
+        component: RsmiSwComponent,
         ver_str: *mut i8,
         length: u32,
     ) -> RocmErr;
     pub fn rsmi_dev_vbios_version_get(dv_ind: u32, vbios: *mut i8, length: usize) -> RocmErr;
     pub fn rsmi_dev_firmware_version_get(
         dv_ind: u32,
-        block: RsmiFwBlockT,
+        block: RsmiFwBlock,
         version: *mut u64,
     ) -> RocmErr;
 }
@@ -27,13 +27,13 @@ pub struct RsmiVersion {
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum RsmiSwComponentT {
+pub enum RsmiSwComponent {
     RsmiSwCompDriver,
 }
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum RsmiFwBlockT {
+pub enum RsmiFwBlock {
     RsmiFwBlockAsd,
     RsmiFwBlockCe,
     RsmiFwBlockDmcu,
@@ -57,28 +57,28 @@ pub enum RsmiFwBlockT {
     RsmiFwBlockVcn,
 }
 
-impl RsmiFwBlockT {
-    pub fn enum_iterator() -> std::array::IntoIter<RsmiFwBlockT, 21>  {
-        [    RsmiFwBlockT::RsmiFwBlockAsd,
-        RsmiFwBlockT::RsmiFwBlockCe,
-        RsmiFwBlockT::RsmiFwBlockDmcu,
-        RsmiFwBlockT::RsmiFwBlockMc,
-        RsmiFwBlockT::RsmiFwBlockMe,
-        RsmiFwBlockT::RsmiFwBlockMec,
-        RsmiFwBlockT::RsmiFwBlockMec2,
-        RsmiFwBlockT::RsmiFwBlockPfp,
-        RsmiFwBlockT::RsmiFwBlockRlc,
-        RsmiFwBlockT::RsmiFwBlockRlcSrlc,
-        RsmiFwBlockT::RsmiFwBlockRlcSrlg,
-        RsmiFwBlockT::RsmiFwBlockRlcSrls,
-        RsmiFwBlockT::RsmiFwBlockSdma,
-        RsmiFwBlockT::RsmiFwBlockSdma2,
-        RsmiFwBlockT::RsmiFwBlockSmc,
-        RsmiFwBlockT::RsmiFwBlockSos,
-        RsmiFwBlockT::RsmiFwBlockTaRas,
-        RsmiFwBlockT::RsmiFwBlockTaXgmi,
-        RsmiFwBlockT::RsmiFwBlockUvd,
-        RsmiFwBlockT::RsmiFwBlockVce,
-        RsmiFwBlockT::RsmiFwBlockVcn].into_iter()
+impl RsmiFwBlock {
+    pub fn enum_iterator() -> std::array::IntoIter<RsmiFwBlock, 21>  {
+        [    RsmiFwBlock::RsmiFwBlockAsd,
+        RsmiFwBlock::RsmiFwBlockCe,
+        RsmiFwBlock::RsmiFwBlockDmcu,
+        RsmiFwBlock::RsmiFwBlockMc,
+        RsmiFwBlock::RsmiFwBlockMe,
+        RsmiFwBlock::RsmiFwBlockMec,
+        RsmiFwBlock::RsmiFwBlockMec2,
+        RsmiFwBlock::RsmiFwBlockPfp,
+        RsmiFwBlock::RsmiFwBlockRlc,
+        RsmiFwBlock::RsmiFwBlockRlcSrlc,
+        RsmiFwBlock::RsmiFwBlockRlcSrlg,
+        RsmiFwBlock::RsmiFwBlockRlcSrls,
+        RsmiFwBlock::RsmiFwBlockSdma,
+        RsmiFwBlock::RsmiFwBlockSdma2,
+        RsmiFwBlock::RsmiFwBlockSmc,
+        RsmiFwBlock::RsmiFwBlockSos,
+        RsmiFwBlock::RsmiFwBlockTaRas,
+        RsmiFwBlock::RsmiFwBlockTaXgmi,
+        RsmiFwBlock::RsmiFwBlockUvd,
+        RsmiFwBlock::RsmiFwBlockVce,
+        RsmiFwBlock::RsmiFwBlockVcn].into_iter()
     }
 }

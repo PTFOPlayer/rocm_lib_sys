@@ -14,7 +14,7 @@ extern "C" {
     ) -> RocmErr;
     pub fn rsmi_dev_volt_metric_get(
         dv_ind: u32,
-        voltage_type: RsmiVoltageTypeT,
+        voltage_type: RsmiVoltageType,
         metric: RsmiVoltageMetric,
         volt: *mut i64,
     ) -> RocmErr;
@@ -67,7 +67,7 @@ pub enum RsmiTemperatureSensor {
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, Default)]
-pub enum RsmiVoltageTypeT {
+pub enum RsmiVoltageType {
     RsmiVoltTypeVddgfx = 0,
     #[default]
     RsmiVoltTypeInvalid = 0xFFFFFFFF,

@@ -4,25 +4,25 @@ use crate::error::RocmErr;
 
 #[link(name = "rsmi64", kind = "static")]
 extern "C" {
-    pub fn rsmi_dev_counter_group_supported(dv_ind: u32, group: RsmiEventGroupT) -> RocmErr;
+    pub fn rsmi_dev_counter_group_supported(dv_ind: u32, group: RsmiEventGroup) -> RocmErr;
     pub fn rsmi_dev_counter_create(
         dv_ind: u32,
-        c_type: RsmiEventTypeT,
-        handle: *mut RsmiEventHandleT,
+        c_type: RsmiEventType,
+        handle: *mut RsmiEventHandle,
     ) -> RocmErr;
-    pub fn rsmi_dev_counter_destroy(handle: RsmiEventHandleT) -> RocmErr;
+    pub fn rsmi_dev_counter_destroy(handle: RsmiEventHandle) -> RocmErr;
     // args not used, set null
-    pub fn rsmi_counter_control(handle: RsmiEventHandleT, cmd: RsmiCounterCommandT, args: *const c_void) -> RocmErr;
-    pub fn rsmi_counter_read(handle: RsmiEventHandleT, value: RsmiCounterValueT) -> RocmErr;
+    pub fn rsmi_counter_control(handle: RsmiEventHandle, cmd: RsmiCounterCommand, args: *const c_void) -> RocmErr;
+    pub fn rsmi_counter_read(handle: RsmiEventHandle, value: RsmiCounterValue) -> RocmErr;
 }
 
-pub unsafe fn rsmi_counter_control_uf(handle: RsmiEventHandleT, cmd: RsmiCounterCommandT) ->RocmErr {
+pub unsafe fn rsmi_counter_control_uf(handle: RsmiEventHandle, cmd: RsmiCounterCommand) ->RocmErr {
     rsmi_counter_control(handle, cmd, std::ptr::null() as *const c_void)
 }
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum RsmiEventGroupT {
+pub enum RsmiEventGroup {
     RsmiEvntGrpXgmi = 0,
     RsmiEvntGrpXgmiDataOut = 10,
     RsmiEvntGrpInvalid = 0xFFFFFFFF,
@@ -30,8 +30,8 @@ pub enum RsmiEventGroupT {
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum RsmiEventTypeT {
-    RsmiEvntXgmi0NopTx = RsmiEventGroupT::RsmiEvntGrpXgmi as isize,
+pub enum RsmiEventType {
+    RsmiEvntXgmi0NopTx = RsmiEventGroup::RsmiEvntGrpXgmi as isize,
     RsmiEvntXgmi0RequestTx,
     RsmiEvntXgmi0ResponseTx,
 
@@ -57,7 +57,7 @@ pub enum RsmiEventTypeT {
      * Throughput = BEATS/time_running * 10<sup>9</sup>  (bytes/second)<br>
      */
     // ie, Throughput = BEATS/time_running 10^9  bytes/sec
-    RsmiEvntXgmiDataOut0 = RsmiEventGroupT::RsmiEvntGrpXgmiDataOut as isize,
+    RsmiEvntXgmiDataOut0 = RsmiEventGroup::RsmiEvntGrpXgmiDataOut as isize,
     RsmiEvntXgmiDataOut1,
     RsmiEvntXgmiDataOut2,
     RsmiEvntXgmiDataOut3,
@@ -65,18 +65,18 @@ pub enum RsmiEventTypeT {
     RsmiEvntXgmiDataOut5,
 }
 
-pub type RsmiEventHandleT = usize;
+pub type RsmiEventHandle = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum RsmiCounterCommandT {
+pub enum RsmiCounterCommand {
     RsmiCntrCmdStart = 0,
     RsmiCntrCmdStop,
 }
 
 #[repr(C)]
 #[derive(Debug, Default, Clone)]
-pub struct RsmiCounterValueT {
+pub struct RsmiCounterValue {
     pub value: u64,            
     pub time_enabled: u64,     
     pub time_running: u64,     
