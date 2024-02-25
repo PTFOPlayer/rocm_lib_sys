@@ -1,29 +1,104 @@
+use libloading::Symbol;
+
 use crate::bindings::queries::pcie::RsmiFrequencies;
 use crate::error::RocmErr;
+use crate::RawRsmi;
 
 pub const RSMI_NUM_VOLTAGE_CURVE_POINTS: usize = 3;
 
-#[link(name = "rsmi64", kind = "static")]
-extern "C" {
-
-    //performance
-    pub fn rsmi_dev_busy_percent_get(dv_ind: u32, percent: *mut u32) -> RocmErr;
-    pub fn rsmi_dev_perf_level_get(dv_ind: u32, level: *mut PerformanceLevel) -> RocmErr;
-    pub fn rsmi_utilization_count_get(
+impl RawRsmi {
+    pub unsafe fn rsmi_dev_busy_percent_get(&mut self, dv_ind: u32, percent: *mut u32) -> RocmErr {
+        let f: Symbol<unsafe extern "C" fn(u32, *mut u32) -> RocmErr> =
+            match self.lib.get(b"rsmi_dev_busy_percent_get") {
+                Ok(res) => res,
+                Err(err) => return err.into(),
+            };
+        f(dv_ind, percent)
+    }
+    pub unsafe fn rsmi_dev_perf_level_get(
+        &mut self,
+        dv_ind: u32,
+        level: *mut PerformanceLevel,
+    ) -> RocmErr {
+        let f: Symbol<unsafe extern "C" fn(u32, *mut PerformanceLevel) -> RocmErr> =
+            match self.lib.get(b"rsmi_dev_perf_level_get") {
+                Ok(res) => res,
+                Err(err) => return err.into(),
+            };
+        f(dv_ind, level)
+    }
+    pub unsafe fn rsmi_utilization_count_get(
+        &mut self,
         dv_ind: u32,
         counter: *mut RsmiUtilizationCounter,
         count: u32,
         timestamp: *mut u64,
-    ) -> RocmErr;
-    pub fn rsmi_dev_gpu_clk_freq_get(
+    ) -> RocmErr {
+        let f: Symbol<
+            unsafe extern "C" fn(u32, *mut RsmiUtilizationCounter, u32, *mut u64) -> RocmErr,
+        > = match self.lib.get(b"rsmi_utilization_count_get") {
+            Ok(res) => res,
+            Err(err) => return err.into(),
+        };
+        f(dv_ind, counter, count, timestamp)
+    }
+    pub unsafe fn rsmi_dev_gpu_clk_freq_get(
+        &mut self,
         dv_ind: u32,
         clk_type: RsmiClkType,
         clk: *mut RsmiFrequencies,
-    ) -> RocmErr;
-    pub fn rsmi_dev_overdrive_level_get(dv_ind: u32, level: *mut u32) -> RocmErr;
-    pub fn rsmi_dev_mem_overdrive_level_get(dv_ind: u32, level: *mut u32) -> RocmErr;
-    pub fn rsmi_dev_od_volt_info_get(dv_ind: u32, ov_volt: *mut RsmiOdVoltFreqData) -> RocmErr;
-    pub fn rsmi_dev_gpu_metrics_info_get(dv_ind: u32, metrics: *mut GpuMetrics) -> RocmErr;
+    ) -> RocmErr {
+        let f: Symbol<unsafe extern "C" fn(u32, RsmiClkType, *mut RsmiFrequencies) -> RocmErr> =
+            match self.lib.get(b"rsmi_dev_gpu_clk_freq_get") {
+                Ok(res) => res,
+                Err(err) => return err.into(),
+            };
+        f(dv_ind, clk_type, clk)
+    }
+    pub unsafe fn rsmi_dev_overdrive_level_get(&mut self, dv_ind: u32, level: *mut u32) -> RocmErr {
+        let f: Symbol<unsafe extern "C" fn(u32, *mut u32) -> RocmErr> =
+            match self.lib.get(b"rsmi_dev_overdrive_level_get") {
+                Ok(res) => res,
+                Err(err) => return err.into(),
+            };
+        f(dv_ind, level)
+    }
+    pub unsafe fn rsmi_dev_mem_overdrive_level_get(
+        &mut self,
+        dv_ind: u32,
+        level: *mut u32,
+    ) -> RocmErr {
+        let f: Symbol<unsafe extern "C" fn(u32, *mut u32) -> RocmErr> =
+            match self.lib.get(b"rsmi_dev_mem_overdrive_level_get") {
+                Ok(res) => res,
+                Err(err) => return err.into(),
+            };
+        f(dv_ind, level)
+    }
+    pub unsafe fn rsmi_dev_od_volt_info_get(
+        &mut self,
+        dv_ind: u32,
+        ov_volt: *mut RsmiOdVoltFreqData,
+    ) -> RocmErr {
+        let f: Symbol<unsafe extern "C" fn(u32, *mut RsmiOdVoltFreqData) -> RocmErr> =
+            match self.lib.get(b"rsmi_dev_od_volt_info_get") {
+                Ok(res) => res,
+                Err(err) => return err.into(),
+            };
+        f(dv_ind, ov_volt)
+    }
+    pub unsafe fn rsmi_dev_gpu_metrics_info_get(
+        &mut self,
+        dv_ind: u32,
+        metrics: *mut GpuMetrics,
+    ) -> RocmErr {
+        let f: Symbol<unsafe extern "C" fn(u32, *mut GpuMetrics) -> RocmErr> =
+            match self.lib.get(b"rsmi_dev_gpu_metrics_info_get") {
+                Ok(res) => res,
+                Err(err) => return err.into(),
+            };
+        f(dv_ind, metrics)
+    }
 }
 
 #[repr(C)]

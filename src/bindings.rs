@@ -12,8 +12,6 @@ use queries::*;
 
 pub use pcie::*;
 
-pub use power::*;
-
 pub use physical::*;
 
 pub use memory::*;
@@ -31,8 +29,6 @@ pub use sys_info::*;
 pub use topology::*;
 
 pub use supported_fn::*;
-// #[link(name = "rsmi64", kind = "static")]
-// extern "C" {}
 
 impl ToString for PerformanceLevel {
     fn to_string(&self) -> String {

@@ -1,23 +1,86 @@
-use crate::error::RocmErr;
+use libloading::Symbol;
 
-#[link(name = "rsmi64", kind = "static")]
-extern "C" {
-    //physical
-    pub fn rsmi_dev_fan_rpms_get(dv_ind: u32, sensor: u32, rpm: *mut i64) -> RocmErr;
-    pub fn rsmi_dev_fan_speed_get(dv_ind: u32, sensor: u32, speed: *mut i64) -> RocmErr;
-    pub fn rsmi_dev_fan_speed_max_get(dv_ind: u32, sensor: u32, speed_max: *mut u64) -> RocmErr;
-    pub fn rsmi_dev_temp_metric_get(
+use crate::{error::RocmErr, RawRsmi};
+
+impl RawRsmi {
+    pub unsafe fn rsmi_dev_fan_rpms_get(
+        &mut self,
+        dv_ind: u32,
+        sensor: u32,
+        rpm: *mut i64,
+    ) -> RocmErr {
+        let f: Symbol<unsafe extern "C" fn(u32, u32, *mut i64) -> RocmErr> =
+            match self.lib.get(b"rsmi_dev_fan_rpms_get") {
+                Ok(res) => res,
+                Err(err) => return err.into(),
+            };
+        f(dv_ind, sensor, rpm)
+    }
+
+    pub unsafe fn rsmi_dev_fan_speed_get(
+        &mut self,
+        dv_ind: u32,
+        sensor: u32,
+        speed: *mut i64,
+    ) -> RocmErr {
+        let f: Symbol<unsafe extern "C" fn(u32, u32, *mut i64) -> RocmErr> =
+            match self.lib.get(b"rsmi_dev_fan_speed_get") {
+                Ok(res) => res,
+                Err(err) => return err.into(),
+            };
+        f(dv_ind, sensor, speed)
+    }
+
+    pub unsafe fn rsmi_dev_fan_speed_max_get(
+        &mut self,
+        dv_ind: u32,
+        sensor: u32,
+        speed_max: *mut u64,
+    ) -> RocmErr {
+        let f: Symbol<unsafe extern "C" fn(u32, u32, *mut u64) -> RocmErr> =
+            match self.lib.get(b"rsmi_dev_fan_speed_max_get") {
+                Ok(res) => res,
+                Err(err) => return err.into(),
+            };
+        f(dv_ind, sensor, speed_max)
+    }
+
+    pub unsafe fn rsmi_dev_temp_metric_get(
+        &mut self,
         dv_ind: u32,
         sensor: RsmiTemperatureSensor,
         metric: RsmiTemperatureMetric,
         temperature: *mut i64,
-    ) -> RocmErr;
-    pub fn rsmi_dev_volt_metric_get(
+    ) -> RocmErr {
+        let f: Symbol<
+            unsafe extern "C" fn(
+                u32,
+                RsmiTemperatureSensor,
+                RsmiTemperatureMetric,
+                *mut i64,
+            ) -> RocmErr,
+        > = match self.lib.get(b"rsmi_dev_temp_metric_get") {
+            Ok(res) => res,
+            Err(err) => return err.into(),
+        };
+        f(dv_ind, sensor, metric, temperature)
+    }
+
+    pub unsafe fn rsmi_dev_volt_metric_get(
+        &mut self,
         dv_ind: u32,
         voltage_type: RsmiVoltageType,
         metric: RsmiVoltageMetric,
         volt: *mut i64,
-    ) -> RocmErr;
+    ) -> RocmErr {
+        let f: Symbol<
+            unsafe extern "C" fn(u32, RsmiVoltageType, RsmiVoltageMetric, *mut i64) -> RocmErr,
+        > = match self.lib.get(b"rsmi_dev_volt_metric_get") {
+            Ok(res) => res,
+            Err(err) => return err.into(),
+        };
+        f(dv_ind, voltage_type, metric, volt)
+    }
 }
 
 #[repr(C)]

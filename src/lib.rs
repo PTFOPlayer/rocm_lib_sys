@@ -51,7 +51,7 @@ impl Drop for RawRsmi {
 
 #[cfg(test)]
 mod test {
-    use crate::{error::RocmErr, RawRsmi};
+    use crate::{bindings::{RsmiFwBlock, RsmiVersion}, error::RocmErr, RawRsmi};
     use std::mem::size_of;
 
     #[test]
@@ -67,54 +67,55 @@ mod test {
         Ok(())
     }
 
-    // #[test]
-    // fn minor_test() -> Result<(), RocmErr> {
-    //     unsafe {
-    //         rsmi_init(0)?.try_err()?;
+    #[test]
+    fn processes() -> Result<(), RocmErr> {
+        unsafe {
+            let mut rrsmi = RawRsmi::new(0)?;
 
-    //         let buff = libc::malloc(size_of::<i8>() * 64).cast();
-    //         rsmi_dev_brand_get(0, buff, 64).try_err()?;
+            let procs = vec![].as_mut_ptr();
+            let mut num_items = 0u32;
+            rrsmi
+                .rsmi_compute_process_info_get(procs, &mut num_items as *mut u32)
+                .try_err()?;
 
-    //         let temp = std::ffi::CString::from_raw(buff);
-    //         println!("{:?}", temp.to_string_lossy().to_string());
+            let slice = std::slice::from_raw_parts_mut(procs, num_items as usize);
+            println!("num procs:{}", num_items);
+            for e in slice {
+                println!("{:?}", e);
+            }
+        }
+        Ok(())
+    }
 
-    //         rsmi_shut_down()?.try_err()?;
-    //     }
-    //     Ok(())
-    // }
+    #[test]
+    fn firmware() -> Result<(), RocmErr> {
+        unsafe {
+            let mut rrsmi = RawRsmi::new(0)?;
 
-    // #[test]
-    // fn processes() -> Result<(), RocmErr> {
-    //     unsafe {
-    //         let procs = vec![].as_mut_ptr();
-    //         let mut num_items = 0u32;
-    //         rsmi_compute_process_info_get(procs, &mut num_items as *mut u32).try_err()?;
+            let mut rsmi_v: RsmiVersion = RsmiVersion {
+                major: 0,
+                minor: 0,
+                patch: 0,
+                build: &mut 0i8,
+            };
 
-    //         let slice = std::slice::from_raw_parts_mut(procs, num_items as usize);
-    //         println!("num procs:{}", num_items);
-    //         for e in slice {
-    //             println!("{:?}", e);
-    //         }
-    //     }
-    //     Ok(())
-    // }
+            rrsmi.rsmi_version_get(&mut rsmi_v as *mut RsmiVersion).try_err()?;
+            println!("Rsmi version: {:?}", rsmi_v);
 
-    // #[test]
-    // fn firmware() -> Result<(), RocmErr> {
-    //     unsafe {
-    //         rsmi_init(0)?.try_err()?;
+            let mut v = 0u64;
+            for item in RsmiFwBlock::enum_iterator() {
+                match rrsmi
+                    .rsmi_dev_firmware_version_get(0, item, &mut v as *mut u64)
+                    .try_err()
+                {
+                    Ok(_) => println!("firmware version {:?}:{}", item, v),
+                    Err(_) => {}
+                }
+            }
+        }
 
-    //         let mut v = 0u64;
-    //         for item in RsmiFwBlockT::enum_iterator() {
-    //             rsmi_dev_firmware_version_get(0, item, &mut v as *mut u64).try_err()?;
-    //             println!("firmware version {:?}:{}", item, v);
-    //         }
-
-    //         rsmi_shut_down()?.try_err()?;
-    //     }
-
-    //     Ok(())
-    // }
+        Ok(())
+    }
 
     // #[test]
     // fn bios() -> Result<(), RocmErr> {
