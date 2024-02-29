@@ -1,24 +1,14 @@
 use libloading::Symbol;
 
-use crate::{error::RocmErr, RawRsmi};
+use crate::{error::RocmErr, function_creator, RawRsmi};
 
 impl RawRsmi {
     pub unsafe fn rsmi_num_monitor_devices(&mut self, num_devices: *mut u32) -> RocmErr {
-        let f: Symbol<unsafe extern "C" fn(*mut u32) -> RocmErr> =
-            match self.lib.get(b"rsmi_num_monitor_devices") {
-                Ok(res) => res,
-                Err(err) => return err.into(),
-            };
-        f(num_devices)
+        function_creator!(self, b"rsmi_num_monitor_devices", <*mut u32>, (num_devices))
     }
 
     pub unsafe fn rsmi_dev_id_get(&mut self, dv_ind: u32, id: *mut u16) -> RocmErr {
-        let f: Symbol<unsafe extern "C" fn(u32, *mut u16) -> RocmErr> =
-            match self.lib.get(b"rsmi_dev_id_get") {
-                Ok(res) => res,
-                Err(err) => return err.into(),
-            };
-        f(dv_ind, id)
+        function_creator!(self, b"rsmi_dev_id_get", <u32, *mut u16>, (dv_ind, id))
     }
 
     pub unsafe fn rsmi_dev_name_get(
@@ -27,21 +17,11 @@ impl RawRsmi {
         name: *mut i8,
         name_length: usize,
     ) -> RocmErr {
-        let f: Symbol<unsafe extern "C" fn(u32, *mut i8, usize) -> RocmErr> =
-            match self.lib.get(b"rsmi_dev_name_get") {
-                Ok(res) => res,
-                Err(err) => return err.into(),
-            };
-        f(dv_ind, name, name_length)
+        function_creator!(self, b"rsmi_dev_name_get", <u32, *mut i8, usize>, (dv_ind, name, name_length) )
     }
 
     pub unsafe fn rsmi_dev_vendor_id_get(&mut self, dv_ind: u32, id: *mut u16) -> RocmErr {
-        let f: Symbol<unsafe extern "C" fn(u32, *mut u16) -> RocmErr> =
-            match self.lib.get(b"rsmi_dev_vendor_id_get") {
-                Ok(res) => res,
-                Err(err) => return err.into(),
-            };
-        f(dv_ind, id)
+        function_creator!(self, b"rsmi_dev_vendor_id_get", <u32, *mut u16>, (dv_ind, id))
     }
 
     pub unsafe fn rsmi_dev_brand_get(

@@ -1,23 +1,52 @@
 use libc::c_void;
 
-use crate::error::RocmErr;
+use crate::{error::RocmErr, function_creator, RawRsmi};
 
-#[link(name = "rsmi64", kind = "static")]
-extern "C" {
-    pub fn rsmi_dev_counter_group_supported(dv_ind: u32, group: RsmiEventGroup) -> RocmErr;
-    pub fn rsmi_dev_counter_create(
+impl RawRsmi {
+    pub unsafe fn rsmi_dev_counter_group_supported(
+        &mut self,
+        dv_ind: u32,
+        group: RsmiEventGroup,
+    ) -> RocmErr {
+        function_creator!(self, b"rsmi_dev_counter_group_supported", <u32, RsmiEventGroup>, (dv_ind, group))
+    }
+    pub unsafe fn rsmi_dev_counter_create(
+        &mut self,
         dv_ind: u32,
         c_type: RsmiEventType,
         handle: *mut RsmiEventHandle,
-    ) -> RocmErr;
-    pub fn rsmi_dev_counter_destroy(handle: RsmiEventHandle) -> RocmErr;
-    // args not used, set null
-    pub fn rsmi_counter_control(handle: RsmiEventHandle, cmd: RsmiCounterCommand, args: *const c_void) -> RocmErr;
-    pub fn rsmi_counter_read(handle: RsmiEventHandle, value: RsmiCounterValue) -> RocmErr;
-}
+    ) -> RocmErr {
+        function_creator!(self, b"rsmi_dev_counter_create", <u32, RsmiEventType, *mut RsmiEventHandle>, (dv_ind, c_type, handle))
+    }
+    pub unsafe fn rsmi_dev_counter_destroy(&mut self, handle: RsmiEventHandle) -> RocmErr {
+        function_creator!(self, b"rsmi_dev_counter_destroy", <RsmiEventHandle>, (handle))
+    }
 
-pub unsafe fn rsmi_counter_control_uf(handle: RsmiEventHandle, cmd: RsmiCounterCommand) ->RocmErr {
-    rsmi_counter_control(handle, cmd, std::ptr::null() as *const c_void)
+    // args not used, set null
+    pub unsafe fn rsmi_counter_control(
+        &mut self,
+        handle: RsmiEventHandle,
+        cmd: RsmiCounterCommand,
+        args: *const c_void,
+    ) -> RocmErr {
+        function_creator!(self, b"rsmi_counter_control", <RsmiEventHandle, RsmiCounterCommand, *const c_void>, (handle, cmd, args))
+    }
+
+    pub unsafe fn rsmi_counter_read(
+        &mut self,
+        handle: RsmiEventHandle,
+        value: RsmiCounterValue,
+    ) -> RocmErr {
+        function_creator!(self, b"rsmi_counter_read", <RsmiEventHandle, RsmiCounterValue>, (handle, value))
+    }
+
+    pub unsafe fn rsmi_counter_control_uf(
+        &mut self,
+        handle: RsmiEventHandle,
+        cmd: RsmiCounterCommand,
+    ) -> RocmErr {
+        self.rsmi_counter_control(handle, cmd, std::ptr::null() as *const c_void)
+    }
 }
 
 #[repr(C)]
@@ -77,7 +106,7 @@ pub enum RsmiCounterCommand {
 #[repr(C)]
 #[derive(Debug, Default, Clone)]
 pub struct RsmiCounterValue {
-    pub value: u64,            
-    pub time_enabled: u64,     
-    pub time_running: u64,     
-} 
+    pub value: u64,
+    pub time_enabled: u64,
+    pub time_running: u64,
+}

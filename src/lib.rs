@@ -12,6 +12,17 @@ pub struct RawRsmi {
     lib: Library,
 }
 
+// all functions will be reworked using this macro in future.
+#[macro_export]
+macro_rules! function_creator {
+    ($self:expr, $name:expr ,<$($t:ty),+>, ($($args:expr),+)) => {
+        match libloading::Library::get::<libloading::Symbol<unsafe extern "C" fn($($t),+) -> RocmErr> >(&$self.lib, b"") {
+            Ok(res) => res($($args),+),
+            Err(err) => err.into(),
+        }
+    };
+}
+
 impl RawRsmi {
     pub unsafe fn new(init_status: u32) -> Result<RawRsmi, RocmErr> {
         let lib = Library::new(PATH)?;
@@ -51,7 +62,11 @@ impl Drop for RawRsmi {
 
 #[cfg(test)]
 mod test {
-    use crate::{bindings::{RsmiFwBlock, RsmiVersion}, error::RocmErr, RawRsmi};
+    use crate::{
+        bindings::{RsmiFwBlock, RsmiVersion},
+        error::RocmErr,
+        RawRsmi,
+    };
     use std::mem::size_of;
 
     #[test]
@@ -99,7 +114,9 @@ mod test {
                 build: &mut 0i8,
             };
 
-            rrsmi.rsmi_version_get(&mut rsmi_v as *mut RsmiVersion).try_err()?;
+            rrsmi
+                .rsmi_version_get(&mut rsmi_v as *mut RsmiVersion)
+                .try_err()?;
             println!("Rsmi version: {:?}", rsmi_v);
 
             let mut v = 0u64;

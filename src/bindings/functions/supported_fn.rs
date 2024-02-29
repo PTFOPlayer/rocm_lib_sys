@@ -1,33 +1,53 @@
-use crate::{error::RocmErr, bindings::{RsmiMemoryType, RsmiTemperatureMetric, RsmiClkType, RsmiFwBlock, RsmiGpuBlock}};
+use crate::{
+    bindings::{RsmiClkType, RsmiFwBlock, RsmiGpuBlock, RsmiMemoryType, RsmiTemperatureMetric},
+    error::RocmErr,
+    function_creator, RawRsmi,
+};
 
-use super::perf_counter::{RsmiEventType, RsmiEventGroup};
+use super::perf_counter::{RsmiEventGroup, RsmiEventType};
 
-#[link(name = "rsmi64", kind = "static")]
-extern "C" {
-
-    pub fn rsmi_dev_supported_func_iterator_open(
+impl RawRsmi {
+    pub unsafe fn rsmi_dev_supported_func_iterator_open(
+        &mut self,
         dv_ind: u32,
         handle: *mut RsmiFuncIdIterHandle,
-    ) -> RocmErr;
-    pub fn rsmi_func_iter_next(handle: RsmiFuncIdIterHandle) -> RocmErr;
-    pub fn rsmi_func_iter_value_get(
+    ) -> RocmErr {
+        function_creator!(self, b"rsmi_dev_supported_func_iterator_open", <u32, *mut RsmiFuncIdIterHandle>, (dv_ind, handle))
+    }
+    pub unsafe fn rsmi_func_iter_next(&mut self, handle: RsmiFuncIdIterHandle) -> RocmErr {
+        function_creator!(self, b"rsmi_func_iter_next", <RsmiFuncIdIterHandle>, (handle))
+    }
+    pub unsafe fn rsmi_func_iter_value_get(
+        &mut self,
         handle: RsmiFuncIdIterHandle,
         value: *mut RsmiFuncIdValue,
-    ) -> RocmErr;
-    pub fn rsmi_dev_supported_func_iterator_close(handle: *mut RsmiFuncIdIterHandle) -> RocmErr;
+    ) -> RocmErr {
+        function_creator!(self, b"rsmi_func_iter_next", <RsmiFuncIdIterHandle, *mut RsmiFuncIdValue>, (handle, value))
+    }
+    pub unsafe fn rsmi_dev_supported_func_iterator_close(
+        &mut self,
+        handle: *mut RsmiFuncIdIterHandle,
+    ) -> RocmErr {
+        function_creator!(self, b"rsmi_dev_supported_func_iterator_close", <*mut RsmiFuncIdIterHandle>, (handle))
+    }
 
-    pub fn 	rsmi_dev_supported_variant_iterator_open (
+    pub unsafe fn rsmi_dev_supported_variant_iterator_open(
+        &mut self,
         handle: RsmiFuncIdIterHandle,
         var_iter: *mut RsmiFuncIdIterHandle,
-    ) -> RocmErr;
+    ) -> RocmErr {
+        function_creator!(self, b"rsmi_dev_supported_variant_iterator_open", <RsmiFuncIdIterHandle, *mut RsmiFuncIdIterHandle>, (handle, var_iter))
+    }
 }
 
-pub const RSMI_DEFAULT_VARIANT: u64 = 0xFFFFFFFFFFFFFFFF; 
+pub const RSMI_DEFAULT_VARIANT: u64 = 0xFFFFFFFFFFFFFFFF;
 
 #[allow(conflicting_repr_hints)]
 #[repr(C)]
 #[derive(Clone, Copy, Default)]
-pub struct RsmiFuncIdIterHandle {_f:u64}
+pub struct RsmiFuncIdIterHandle {
+    _f: u64,
+}
 
 impl RsmiFuncIdIterHandle {
     pub fn new() -> Self {
@@ -44,7 +64,7 @@ pub union RsmiFuncIdValue {
 
 impl Default for RsmiFuncIdValue {
     fn default() -> Self {
-        Self{id: 0}
+        Self { id: 0 }
     }
 }
 #[repr(C)]

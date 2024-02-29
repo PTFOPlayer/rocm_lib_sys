@@ -1,5 +1,5 @@
-use libloading::Symbol;
 use crate::{error::RocmErr, RawRsmi};
+use libloading::Symbol;
 
 impl RawRsmi {
     pub unsafe fn rsmi_dev_ecc_count_get(
