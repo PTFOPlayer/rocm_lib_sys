@@ -1,7 +1,9 @@
+use libloading::Symbol;
+
 use crate::{
     bindings::{RsmiClkType, RsmiFwBlock, RsmiGpuBlock, RsmiMemoryType, RsmiTemperatureMetric},
     error::RocmErr,
-    function_creator, RawRsmi,
+    RawRsmi,
 };
 
 use super::perf_counter::{RsmiEventGroup, RsmiEventType};
@@ -12,23 +14,43 @@ impl RawRsmi {
         dv_ind: u32,
         handle: *mut RsmiFuncIdIterHandle,
     ) -> RocmErr {
-        function_creator!(self, b"rsmi_dev_supported_func_iterator_open", <u32, *mut RsmiFuncIdIterHandle>, (dv_ind, handle))
+        let f: Symbol<unsafe extern "C" fn(u32, *mut RsmiFuncIdIterHandle) -> RocmErr> =
+            match self.lib.get(b"rsmi_dev_supported_func_iterator_open") {
+                Ok(res) => res,
+                Err(err) => return err.into(),
+            };
+        f(dv_ind, handle)
     }
     pub unsafe fn rsmi_func_iter_next(&mut self, handle: RsmiFuncIdIterHandle) -> RocmErr {
-        function_creator!(self, b"rsmi_func_iter_next", <RsmiFuncIdIterHandle>, (handle))
+        let f: Symbol<unsafe extern "C" fn(RsmiFuncIdIterHandle) -> RocmErr> =
+            match self.lib.get(b"rsmi_func_iter_next") {
+                Ok(res) => res,
+                Err(err) => return err.into(),
+            };
+        f(handle)
     }
     pub unsafe fn rsmi_func_iter_value_get(
         &mut self,
         handle: RsmiFuncIdIterHandle,
         value: *mut RsmiFuncIdValue,
     ) -> RocmErr {
-        function_creator!(self, b"rsmi_func_iter_next", <RsmiFuncIdIterHandle, *mut RsmiFuncIdValue>, (handle, value))
+        let f: Symbol<unsafe extern "C" fn(RsmiFuncIdIterHandle, *mut RsmiFuncIdValue) -> RocmErr> =
+            match self.lib.get(b"rsmi_func_iter_value_get") {
+                Ok(res) => res,
+                Err(err) => return err.into(),
+            };
+        f(handle, value)
     }
     pub unsafe fn rsmi_dev_supported_func_iterator_close(
         &mut self,
         handle: *mut RsmiFuncIdIterHandle,
     ) -> RocmErr {
-        function_creator!(self, b"rsmi_dev_supported_func_iterator_close", <*mut RsmiFuncIdIterHandle>, (handle))
+        let f: Symbol<unsafe extern "C" fn(*mut RsmiFuncIdIterHandle) -> RocmErr> =
+            match self.lib.get(b"rsmi_dev_supported_func_iterator_close") {
+                Ok(res) => res,
+                Err(err) => return err.into(),
+            };
+        f(handle)
     }
 
     pub unsafe fn rsmi_dev_supported_variant_iterator_open(
@@ -36,7 +58,13 @@ impl RawRsmi {
         handle: RsmiFuncIdIterHandle,
         var_iter: *mut RsmiFuncIdIterHandle,
     ) -> RocmErr {
-        function_creator!(self, b"rsmi_dev_supported_variant_iterator_open", <RsmiFuncIdIterHandle, *mut RsmiFuncIdIterHandle>, (handle, var_iter))
+        let f: Symbol<
+            unsafe extern "C" fn(RsmiFuncIdIterHandle, *mut RsmiFuncIdIterHandle) -> RocmErr,
+        > = match self.lib.get(b"rsmi_dev_supported_variant_iterator_open") {
+            Ok(res) => res,
+            Err(err) => return err.into(),
+        };
+        f(handle, var_iter)
     }
 }
 

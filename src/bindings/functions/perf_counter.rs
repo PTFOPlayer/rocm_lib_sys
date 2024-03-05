@@ -1,6 +1,7 @@
 use libc::c_void;
+use libloading::Symbol;
 
-use crate::{error::RocmErr, function_creator, RawRsmi};
+use crate::{error::RocmErr, RawRsmi};
 
 impl RawRsmi {
     pub unsafe fn rsmi_dev_counter_group_supported(
@@ -8,7 +9,12 @@ impl RawRsmi {
         dv_ind: u32,
         group: RsmiEventGroup,
     ) -> RocmErr {
-        function_creator!(self, b"rsmi_dev_counter_group_supported", <u32, RsmiEventGroup>, (dv_ind, group))
+        let f: Symbol<unsafe extern "C" fn(u32, RsmiEventGroup) -> RocmErr> =
+            match self.lib.get(b"rsmi_dev_counter_group_supported") {
+                Ok(res) => res,
+                Err(err) => return err.into(),
+            };
+        f(dv_ind, group)
     }
     pub unsafe fn rsmi_dev_counter_create(
         &mut self,
@@ -16,10 +22,20 @@ impl RawRsmi {
         c_type: RsmiEventType,
         handle: *mut RsmiEventHandle,
     ) -> RocmErr {
-        function_creator!(self, b"rsmi_dev_counter_create", <u32, RsmiEventType, *mut RsmiEventHandle>, (dv_ind, c_type, handle))
+        let f: Symbol<unsafe extern "C" fn(u32, RsmiEventType, *mut RsmiEventHandle) -> RocmErr> =
+            match self.lib.get(b"rsmi_dev_counter_create") {
+                Ok(res) => res,
+                Err(err) => return err.into(),
+            };
+        f(dv_ind, c_type, handle)
     }
     pub unsafe fn rsmi_dev_counter_destroy(&mut self, handle: RsmiEventHandle) -> RocmErr {
-        function_creator!(self, b"rsmi_dev_counter_destroy", <RsmiEventHandle>, (handle))
+        let f: Symbol<unsafe extern "C" fn(RsmiEventHandle) -> RocmErr> =
+            match self.lib.get(b"rsmi_dev_counter_destroy") {
+                Ok(res) => res,
+                Err(err) => return err.into(),
+            };
+        f(handle)
     }
 
     // args not used, set null
@@ -29,7 +45,13 @@ impl RawRsmi {
         cmd: RsmiCounterCommand,
         args: *const c_void,
     ) -> RocmErr {
-        function_creator!(self, b"rsmi_counter_control", <RsmiEventHandle, RsmiCounterCommand, *const c_void>, (handle, cmd, args))
+        let f: Symbol<
+            unsafe extern "C" fn(RsmiEventHandle, RsmiCounterCommand, *const c_void) -> RocmErr,
+        > = match self.lib.get(b"rsmi_counter_control") {
+            Ok(res) => res,
+            Err(err) => return err.into(),
+        };
+        f(handle, cmd, args)
     }
 
     pub unsafe fn rsmi_counter_read(
@@ -37,7 +59,12 @@ impl RawRsmi {
         handle: RsmiEventHandle,
         value: RsmiCounterValue,
     ) -> RocmErr {
-        function_creator!(self, b"rsmi_counter_read", <RsmiEventHandle, RsmiCounterValue>, (handle, value))
+        let f: Symbol<unsafe extern "C" fn(RsmiEventHandle, RsmiCounterValue) -> RocmErr> =
+            match self.lib.get(b"rsmi_counter_read") {
+                Ok(res) => res,
+                Err(err) => return err.into(),
+            };
+        f(handle, value)
     }
 
     pub unsafe fn rsmi_counter_control_uf(

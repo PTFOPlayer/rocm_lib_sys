@@ -12,17 +12,6 @@ pub struct RawRsmi {
     lib: Library,
 }
 
-// all functions will be reworked using this macro in future.
-#[macro_export]
-macro_rules! function_creator {
-    ($self:expr, $name:expr ,<$($t:ty),+>, ($($args:expr),+)) => {
-        match libloading::Library::get::<libloading::Symbol<unsafe extern "C" fn($($t),+) -> RocmErr> >(&$self.lib, b"") {
-            Ok(res) => res($($args),+),
-            Err(err) => err.into(),
-        }
-    };
-}
-
 impl RawRsmi {
     pub unsafe fn new(init_status: u32) -> Result<RawRsmi, RocmErr> {
         let lib = Library::new(PATH)?;

@@ -1,4 +1,6 @@
-use crate::{error::RocmErr, function_creator, RawRsmi};
+use libloading::Symbol;
+
+use crate::{error::RocmErr, RawRsmi};
 
 impl RawRsmi {
     pub unsafe fn rsmi_topo_get_numa_node_number(
@@ -6,7 +8,12 @@ impl RawRsmi {
         dv_ind: u32,
         numa_node: *mut u32,
     ) -> RocmErr {
-        function_creator!(self, b"rsmi_topo_get_numa_node_number", <u32, *mut u32>, (dv_ind, numa_node))
+        let f: Symbol<unsafe extern "C" fn(u32, *mut u32) -> RocmErr> =
+            match self.lib.get(b"rsmi_topo_get_numa_node_number") {
+                Ok(res) => res,
+                Err(err) => return err.into(),
+            };
+        f(dv_ind, numa_node)
     }
 
     pub unsafe fn rsmi_topo_get_link_weight(
@@ -15,7 +22,12 @@ impl RawRsmi {
         dv_ind_dest: u32,
         weight: *mut u64,
     ) -> RocmErr {
-        function_creator!(self, b"rsmi_topo_get_link_weight", <u32, u32, *mut u64>, (dv_ind_src, dv_ind_dest, weight))
+        let f: Symbol<unsafe extern "C" fn(u32, u32, *mut u64) -> RocmErr> =
+            match self.lib.get(b"rsmi_topo_get_link_weight") {
+                Ok(res) => res,
+                Err(err) => return err.into(),
+            };
+        f(dv_ind_src, dv_ind_dest, weight)
     }
 
     pub unsafe fn rsmi_minmax_bandwidth_get(
@@ -25,7 +37,12 @@ impl RawRsmi {
         min_bandwidth: *mut u64,
         max_bandwidth: *mut u64,
     ) -> RocmErr {
-        function_creator!(self, b"rsmi_minmax_bandwidth_get", <u32, u32, *mut u64, *mut u64>, (dv_ind_src, dv_ind_dest, min_bandwidth, max_bandwidth))
+        let f: Symbol<unsafe extern "C" fn(u32, u32, *mut u64, *mut u64) -> RocmErr> =
+            match self.lib.get(b"rsmi_minmax_bandwidth_get") {
+                Ok(res) => res,
+                Err(err) => return err.into(),
+            };
+        f(dv_ind_src, dv_ind_dest, min_bandwidth, max_bandwidth)
     }
 
     pub unsafe fn rsmi_topo_get_link_type(
@@ -35,7 +52,12 @@ impl RawRsmi {
         hops: *mut u64,
         link_type: *mut RsmiIoLinkType,
     ) -> RocmErr {
-        function_creator!(self, b"rsmi_topo_get_link_type", <u32, u32, *mut u64, *mut RsmiIoLinkType>, (dv_ind_src, dv_ind_dest, hops, link_type))
+        let f: Symbol<unsafe extern "C" fn(u32, u32, *mut u64, *mut RsmiIoLinkType) -> RocmErr> =
+            match self.lib.get(b"rsmi_topo_get_link_type") {
+                Ok(res) => res,
+                Err(err) => return err.into(),
+            };
+        f(dv_ind_src, dv_ind_dest, hops, link_type)
     }
 
     #[allow(non_snake_case)]
@@ -45,7 +67,12 @@ impl RawRsmi {
         dv_ind_dest: u32,
         acceesible: *mut bool,
     ) -> RocmErr {
-        function_creator!(self, b"rsmi_is_P2P_accessible", <u32, u32, *mut bool>, (dv_ind_src, dv_ind_dest, acceesible))
+        let f: Symbol<unsafe extern "C" fn(u32, u32, *mut bool) -> RocmErr> =
+            match self.lib.get(b"rsmi_is_P2P_accessible") {
+                Ok(res) => res,
+                Err(err) => return err.into(),
+            };
+        f(dv_ind_src, dv_ind_dest, acceesible)
     }
 }
 
