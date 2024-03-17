@@ -46,6 +46,19 @@ impl RawRsmi {
             };
         f(dv_ind, sent, received, max_pkt_sz)
     }
+
+    pub unsafe fn rsmi_dev_pci_replay_counter_get(
+        &mut self,
+        dv_ind: u32,
+        counter: *mut u64,
+    ) -> RocmErr {
+        let f: Symbol<unsafe extern "C" fn(u32, *mut u64) -> RocmErr> =
+            match self.lib.get(b"rsmi_dev_pci_replay_counter_get") {
+                Ok(res) => res,
+                Err(err) => return err.into(),
+            };
+        f(dv_ind, counter)
+    }
 }
 
 #[repr(C)]

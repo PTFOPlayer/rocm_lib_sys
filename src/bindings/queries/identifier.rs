@@ -21,6 +21,23 @@ impl RawRsmi {
         f(dv_ind, id)
     }
 
+    pub unsafe fn rsmi_dev_revision_get(&mut self, dv_ind: u32, revision: *mut u16) -> RocmErr {
+        let f: Symbol<unsafe extern "C" fn(u32, *mut u16) -> RocmErr> =
+            match self.lib.get(b"rsmi_dev_revision_get") {
+                Ok(res) => res,
+                Err(err) => return err.into(),
+            };
+        f(dv_ind, revision)
+    }
+    pub unsafe fn rsmi_dev_sku_get(&mut self, dv_ind: u32, sku: *mut i8) -> RocmErr {
+        let f: Symbol<unsafe extern "C" fn(u32, *mut i8) -> RocmErr> =
+            match self.lib.get(b"rsmi_dev_sku_get") {
+                Ok(res) => res,
+                Err(err) => return err.into(),
+            };
+        f(dv_ind, sku)
+    }
+
     pub unsafe fn rsmi_dev_name_get(
         &mut self,
         dv_ind: u32,
@@ -156,5 +173,14 @@ impl RawRsmi {
                 Err(err) => return err.into(),
             };
         f(dv_ind, unique_id)
+    }
+
+    pub unsafe fn rsmi_dev_xgmi_physical_id_get(&mut self, dv_ind: u32, id: *mut u16) -> RocmErr {
+        let f: Symbol<unsafe extern "C" fn(u32, *mut u16) -> RocmErr> =
+            match self.lib.get(b"rsmi_dev_xgmi_physical_id_get") {
+                Ok(res) => res,
+                Err(err) => return err.into(),
+            };
+        f(dv_ind, id)
     }
 }

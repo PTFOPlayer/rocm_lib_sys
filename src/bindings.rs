@@ -1,10 +1,10 @@
-use crate::error::RocmErr;
 // Maximum possible value for fan speed. Should be used as the denominator
 // when determining fan speed percentage.
 pub const RSMI_MAX_FAN_SPEED: usize = 255;
 
 mod queries;
 mod functions;
+mod controls;
 
 pub use functions::*;
 
@@ -45,16 +45,4 @@ impl ToString for PerformanceLevel {
             PerformanceLevel::Unknown => "performance level: Unknown".to_owned(),
         }
     }
-}
-
-#[inline(always)]
-pub unsafe fn string_from_fn(
-    dv_ind: u32,
-    name_size: usize,
-    f: unsafe extern "C" fn(u32, *mut i8, usize) -> RocmErr,
-) -> Result<String, RocmErr> {
-    let buff = libc::malloc(name_size).cast();
-    f(dv_ind, buff, name_size).try_err()?;
-    let temp = std::ffi::CString::from_raw(buff);
-    return Ok(temp.to_string_lossy().to_string());
 }

@@ -17,6 +17,48 @@ impl RawRsmi {
         f(dv_ind, sensor, ave)
     }
 
+    pub unsafe fn rsmi_dev_current_socket_power_get(
+        &mut self,
+        dv_ind: u32,
+        power: *mut u64,
+    ) -> RocmErr {
+        let f: Symbol<unsafe extern "C" fn(u32, *mut u64) -> RocmErr> =
+            match self.lib.get(b"rsmi_dev_current_socket_power_get") {
+                Ok(res) => res,
+                Err(err) => return err.into(),
+            };
+        f(dv_ind, power)
+    }
+
+    pub unsafe fn rsmi_dev_power_get(
+        &mut self,
+        dv_ind: u32,
+        power: *mut u64,
+        pwr_type: *mut RsmiPowerType,
+    ) -> RocmErr {
+        let f: Symbol<unsafe extern "C" fn(u32, *mut u64, *mut RsmiPowerType) -> RocmErr> =
+            match self.lib.get(b"rsmi_dev_power_get") {
+                Ok(res) => res,
+                Err(err) => return err.into(),
+            };
+        f(dv_ind, power, pwr_type)
+    }
+
+    pub unsafe fn rsmi_dev_energy_count_get(
+        &mut self,
+        dv_ind: u32,
+        power: *mut u64,
+        counter_resolution: *mut f32,
+        time_stamp: *mut u64,
+    ) -> RocmErr {
+        let f: Symbol<unsafe extern "C" fn(u32, *mut u64, *mut f32, *mut u64) -> RocmErr> =
+            match self.lib.get(b"rsmi_dev_energy_count_get") {
+                Ok(res) => res,
+                Err(err) => return err.into(),
+            };
+        f(dv_ind, power, counter_resolution, time_stamp)
+    }
+
     pub unsafe fn rsmi_dev_power_cap_get(
         &mut self,
         dv_ind: u32,
@@ -58,4 +100,12 @@ impl RawRsmi {
             };
         f(dv_ind, default)
     }
+}
+
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub enum RsmiPowerType {
+    RsmiAveragePower = 0,
+    RsmiCurrentPower,
+    RsmiInvalidPower = 0xFFFFFFFF,
 }
