@@ -1,6 +1,6 @@
 [package]
 name = "rocm_smi_lib_sys"
-version = "0.2.2"
+version = "0.2.2-rc1"
 edition = "2021"
 license = "MIT OR Apache-2.0"
 authors = ["WhiskyAKM"]
