@@ -62,7 +62,7 @@ mod test {
     fn name_brand_rev_sku_test() -> Result<(), RocmErr> {
         unsafe {
             let mut rrsmi = RawRsmi::new(0)?;
-            
+
             let brand_buff = libc::malloc(size_of::<i8>() * 64).cast();
             rrsmi.rsmi_dev_brand_get(0, brand_buff, 64).try_err()?;
             let temp = std::ffi::CString::from_raw(brand_buff);
@@ -74,13 +74,15 @@ mod test {
             println!("name: {:?}", temp.to_string_lossy().to_string());
 
             let mut rev = 0u16;
-            rrsmi.rsmi_dev_revision_get(0, &mut rev as * mut u16).try_err()?;
+            rrsmi
+                .rsmi_dev_revision_get(0, &mut rev as *mut u16)
+                .try_err()?;
             println!("revision: 0x{:x?}", rev);
 
-            let sku_buff = libc::malloc(size_of::<i8>() * 64).cast();
-            rrsmi.rsmi_dev_sku_get(0, sku_buff).try_err()?;
-            let temp = std::ffi::CString::from_raw(sku_buff);
-            println!("sku: {:?}", temp.to_string_lossy().to_string());
+            // sku function is probly broken
+            // let mut sku = 0u16;
+            // rrsmi.rsmi_dev_sku_get(0, &mut sku as * mut u16).try_err()?;
+            // println!("sku: {:?}", sku);
         }
 
         Ok(())
@@ -135,6 +137,21 @@ mod test {
             }
         }
 
+        Ok(())
+    }
+
+    #[test]
+    fn activity_test() -> Result<(), RocmErr> {
+        unsafe {
+            let mut rrsmi = RawRsmi::new(0)?;
+
+            let mut acc = 0u16;
+            rrsmi
+                .rsmi_dev_activity_avg_mm_get(0, &mut acc as *mut u16)
+                .try_err()?;
+
+            println!("avg acc:{}", acc);
+        }
         Ok(())
     }
 

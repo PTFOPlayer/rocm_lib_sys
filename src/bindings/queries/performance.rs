@@ -15,18 +15,7 @@ impl RawRsmi {
             };
         f(dv_ind, percent)
     }
-    pub unsafe fn rsmi_dev_perf_level_get(
-        &mut self,
-        dv_ind: u32,
-        level: *mut PerformanceLevel,
-    ) -> RocmErr {
-        let f: Symbol<unsafe extern "C" fn(u32, *mut PerformanceLevel) -> RocmErr> =
-            match self.lib.get(b"rsmi_dev_perf_level_get") {
-                Ok(res) => res,
-                Err(err) => return err.into(),
-            };
-        f(dv_ind, level)
-    }
+
     pub unsafe fn rsmi_utilization_count_get(
         &mut self,
         dv_ind: u32,
@@ -42,6 +31,49 @@ impl RawRsmi {
         };
         f(dv_ind, counter, count, timestamp)
     }
+    pub unsafe fn rsmi_dev_activity_metric_get(
+        &mut self,
+        dv_ind: u32,
+        activity_metric_type: *mut RsmiActivityMetric,
+        timestamp: *mut RsmiActivityMetricCounter,
+    ) -> RocmErr {
+        let f: Symbol<
+            unsafe extern "C" fn(
+                u32,
+                *mut RsmiActivityMetric,
+                *mut RsmiActivityMetricCounter,
+            ) -> RocmErr,
+        > = match self.lib.get(b"rsmi_dev_activity_metric_get") {
+            Ok(res) => res,
+            Err(err) => return err.into(),
+        };
+        f(dv_ind, activity_metric_type, timestamp)
+    }
+    pub unsafe fn rsmi_dev_activity_avg_mm_get(
+        &mut self,
+        dv_ind: u32,
+        avg_activity: *mut u16,
+    ) -> RocmErr {
+        let f: Symbol<unsafe extern "C" fn(u32, *mut u16) -> RocmErr> =
+            match self.lib.get(b"rsmi_dev_activity_avg_mm_get") {
+                Ok(res) => res,
+                Err(err) => return err.into(),
+            };
+        f(dv_ind, avg_activity)
+    }
+    pub unsafe fn rsmi_dev_perf_level_get(
+        &mut self,
+        dv_ind: u32,
+        level: *mut PerformanceLevel,
+    ) -> RocmErr {
+        let f: Symbol<unsafe extern "C" fn(u32, *mut PerformanceLevel) -> RocmErr> =
+            match self.lib.get(b"rsmi_dev_perf_level_get") {
+                Ok(res) => res,
+                Err(err) => return err.into(),
+            };
+        f(dv_ind, level)
+    }
+
     pub unsafe fn rsmi_dev_gpu_clk_freq_get(
         &mut self,
         dv_ind: u32,
@@ -98,6 +130,33 @@ impl RawRsmi {
                 Err(err) => return err.into(),
             };
         f(dv_ind, metrics)
+    }
+    pub unsafe fn rsmi_dev_od_volt_curve_regions_get(
+        &mut self,
+        dv_ind: u32,
+        num_regions: *mut u32,
+        buffer: *mut RsmiFreqVoltRegion,
+    ) -> RocmErr {
+        let f: Symbol<unsafe extern "C" fn(u32, *mut u32, *mut RsmiFreqVoltRegion) -> RocmErr> =
+            match self.lib.get(b"rsmi_dev_gpu_metrics_info_get") {
+                Ok(res) => res,
+                Err(err) => return err.into(),
+            };
+        f(dv_ind, num_regions, buffer)
+    }
+
+    pub unsafe fn rsmi_dev_power_profile_presets_get(
+        &mut self,
+        dv_ind: u32,
+        sensor_ind: u32,
+        status: *mut RsmiPowerProfileStatus,
+    ) -> RocmErr {
+        let f: Symbol<unsafe extern "C" fn(u32, u32, *mut RsmiPowerProfileStatus) -> RocmErr> =
+            match self.lib.get(b"rsmi_dev_gpu_metrics_info_get") {
+                Ok(res) => res,
+                Err(err) => return err.into(),
+            };
+        f(dv_ind, sensor_ind, status)
     }
 }
 
@@ -236,4 +295,48 @@ pub struct MeticHeader {
     pub structure_size: u16,
     pub format_revision: u8,
     pub content_revision: u8,
+}
+
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub enum RsmiActivityMetric {
+    RsmiActivityUmc,
+    RsmiActivityMm,
+}
+
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct RsmiActivityMetricCounter {
+    average_gfx_activity: u16,
+    average_umc_activity: u16,
+    average_mm_activity: u16,
+}
+#[repr(C)]
+#[derive(Debug, Clone)]
+pub struct RsmiFreqVoltRegion {
+    freq_range: RsmiRange,
+    volt_range: RsmiRange,
+}
+
+#[repr(C)]
+#[derive(Debug, Clone)]
+pub struct RsmiPowerProfileStatus {
+    available_profiles: u64,
+    current: RsmiPowerProfilePresetMasks,
+    num_profiles: u32,
+}
+
+#[allow(conflicting_repr_hints)]
+#[repr(C)]
+#[repr(usize)]
+#[derive(Debug, Clone)]
+pub enum RsmiPowerProfilePresetMasks {
+    RsmiPwrProfPrstCustomMask = 0x1,
+    RsmiPwrProfPrstVideoMask = 0x2,
+    RsmiPwrProfPrstPowerSavingMask = 0x4,
+    RsmiPwrProfPrstComputeMask = 0x8,
+    RsmiPwrProfPrstVrMask = 0x10,
+    RsmiPwrProfPrst3dFullScrMask = 0x20,
+    RsmiPwrProfPrstBootupDefault = 0x40,
+    RsmiPwrProfPrstInvalid = 0xFFFFFFFFFFFFFFFF,
 }

@@ -29,14 +29,15 @@ impl RawRsmi {
             };
         f(dv_ind, revision)
     }
-    pub unsafe fn rsmi_dev_sku_get(&mut self, dv_ind: u32, sku: *mut i8) -> RocmErr {
-        let f: Symbol<unsafe extern "C" fn(u32, *mut i8) -> RocmErr> =
-            match self.lib.get(b"rsmi_dev_sku_get") {
-                Ok(res) => res,
-                Err(err) => return err.into(),
-            };
-        f(dv_ind, sku)
-    }
+
+    // pub unsafe fn rsmi_dev_sku_get(&mut self, dv_ind: u32, sku: *mut u16) -> RocmErr {
+    //     let f: Symbol<unsafe extern "C" fn(u32, *mut u16) -> RocmErr> =
+    //         match self.lib.get(b"rsmi_dev_sku_get") {
+    //             Ok(res) => res,
+    //             Err(err) => return err.into(),
+    //         };
+    //     f(dv_ind, sku)
+    // }
 
     pub unsafe fn rsmi_dev_name_get(
         &mut self,
