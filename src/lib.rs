@@ -52,7 +52,7 @@ impl Drop for RawRsmi {
 #[cfg(test)]
 mod test {
     use crate::{
-        bindings::{RsmiFwBlock, RsmiVersion},
+        bindings::{RsmiFwBlock, RsmiGpuMetrics, RsmiVersion},
         error::RocmErr,
         RawRsmi,
     };
@@ -151,6 +151,24 @@ mod test {
                 .try_err()?;
 
             println!("avg acc:{}", acc);
+        }
+        Ok(())
+    }
+
+    #[test]
+    fn gpu_metrics_test() -> Result<(), RocmErr> {
+        unsafe {
+            let mut rrsmi = RawRsmi::new(0)?;
+
+            let mut metrics = RsmiGpuMetrics::default();
+            rrsmi
+                .rsmi_dev_gpu_metrics_info_get(0, &mut metrics as *mut RsmiGpuMetrics)
+                .try_err()?;
+
+            println!("metrics:{:?}", metrics);
+            for e in metrics.safety_padding {
+                println!("safety padding binary:{:x}", e)
+            }
         }
         Ok(())
     }

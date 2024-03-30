@@ -122,9 +122,9 @@ impl RawRsmi {
     pub unsafe fn rsmi_dev_gpu_metrics_info_get(
         &mut self,
         dv_ind: u32,
-        metrics: *mut GpuMetrics,
+        metrics: *mut RsmiGpuMetrics,
     ) -> RocmErr {
-        let f: Symbol<unsafe extern "C" fn(u32, *mut GpuMetrics) -> RocmErr> =
+        let f: Symbol<unsafe extern "C" fn(u32, *mut RsmiGpuMetrics) -> RocmErr> =
             match self.lib.get(b"rsmi_dev_gpu_metrics_info_get") {
                 Ok(res) => res,
                 Err(err) => return err.into(),
@@ -233,9 +233,10 @@ pub struct RsmiOdVoltCurve {
 
 #[repr(C)]
 #[derive(Debug, Default, Clone)]
-pub struct GpuMetrics {
+pub struct RsmiGpuMetrics {
     /// metric header
     pub headers: MeticHeader,
+
     /// Temperature
     pub temperature_edge: u16,
     pub temperature_hotspot: u16,
@@ -243,29 +244,31 @@ pub struct GpuMetrics {
     pub temperature_vrgfx: u16,
     pub temperature_vrsoc: u16,
     pub temperature_vrmem: u16,
+
     /// Utilization
     pub average_gfx_activity: u16,
     pub average_umc_activity: u16, // memory controller
     pub average_mm_activity: u16,  // UVD or VCN
+
     /// Power/Energy
     pub average_socket_power: u16,
     pub energy_accumulator: u64,
+
     /// Driver attached timestamp (in ns)
     pub system_clock_counter: u64,
+
     /// Average clocks
     pub average_gfxclk_frequency: u16,
-    /// needs filter
     pub average_socclk_frequency: u16,
     pub average_uclk_frequency: u16,
     pub average_vclk0_frequency: u16,
     pub average_dclk0_frequency: u16,
     pub average_vclk1_frequency: u16,
     pub average_dclk1_frequency: u16,
+
     /// Current clocks
     pub current_gfxclk: u16,
-    /// needs filter
     pub current_socclk: u16,
-    /// needs filter
     pub current_uclk: u16,
     pub current_vclk0: u16,
     pub current_dclk0: u16,
@@ -279,14 +282,66 @@ pub struct GpuMetrics {
     pub pcie_link_width: u16,
     pub pcie_link_speed: u16,
 
-    /// not sure what it is for
-    /// needs filter
-    pub padding: u16,
-
     pub gfx_activity_acc: u32,
     pub mem_actvity_acc: u32,
-    /// needs filter
     pub temperature_hbm: [u16; 4],
+
+    // firmware timestamp
+    pub firmware_timestamp: u64,
+
+    // voltages mV
+    pub voltage_soc: u16,
+    pub voltage_gfx: u16,
+    pub voltage_mem: u16,
+
+    // Power (Watts)
+    pub current_socket_power: u16,
+
+    // Utilization (%)
+    pub vcn_activity: [u16; 4], // VCN instances activity percent (encode/decode)
+
+    // Clock Lock Status. Each bit corresponds to clock instance
+    pub gfxclk_lock_status: u32,
+
+    // XGMI bus width and bitrate (in Gbps)
+    pub xgmi_link_width: u16,
+    pub xgmi_link_speed: u16,
+
+    // PCIE accumulated bandwidth (GB/sec)
+    pub pcie_bandwidth_acc: u64,
+
+    // PCIE instantaneous bandwidth (GB/sec)
+    pub pcie_bandwidth_inst: u64,
+
+    // PCIE L0 to recovery state transition accumulated count
+    pub pcie_l0_to_recov_count_acc: u64,
+
+    // PCIE replay accumulated count
+    pub pcie_replay_count_acc: u64,
+
+    // PCIE replay rollover accumulated count
+    pub pcie_replay_rover_count_acc: u64,
+
+    // XGMI accumulated data transfer size(KiloBytes)
+    pub xgmi_read_data_acc: [u64; 8],
+    pub xgmi_write_data_acc: [u64; 8],
+
+    // XGMI accumulated data transfer size(KiloBytes)
+    pub current_gfxclks: [u16; 8],
+    pub current_socclks: [u16; 4],
+    pub current_vclk0s: [u16; 4],
+    pub current_dclk0s: [u16; 4],
+
+    // JPEG activity percent (encode/decode)
+    pub jpeg_activity: [u16; 32],
+
+    // PCIE NAK sent accumulated count
+    pub pcie_nak_sent_count_acc: u32,
+
+    // PCIE NAK received accumulated count
+    pub pcie_nak_rcvd_count_acc: u32,
+
+    pub safety_padding: [u128;2]
 }
 
 #[repr(C)]
