@@ -152,7 +152,7 @@ impl RawRsmi {
         status: *mut RsmiPowerProfileStatus,
     ) -> RocmErr {
         let f: Symbol<unsafe extern "C" fn(u32, u32, *mut RsmiPowerProfileStatus) -> RocmErr> =
-            match self.lib.get(b"rsmi_dev_gpu_metrics_info_get") {
+            match self.lib.get(b"rsmi_dev_power_profile_presets_get") {
                 Ok(res) => res,
                 Err(err) => return err.into(),
             };
@@ -374,7 +374,7 @@ pub struct RsmiFreqVoltRegion {
 }
 
 #[repr(C)]
-#[derive(Debug, Clone)]
+#[derive(Debug, Default, Clone)]
 pub struct RsmiPowerProfileStatus {
     available_profiles: u64,
     current: RsmiPowerProfilePresetMasks,
@@ -384,7 +384,7 @@ pub struct RsmiPowerProfileStatus {
 #[allow(conflicting_repr_hints)]
 #[repr(C)]
 #[repr(usize)]
-#[derive(Debug, Clone)]
+#[derive(Debug, Default, Clone)]
 pub enum RsmiPowerProfilePresetMasks {
     RsmiPwrProfPrstCustomMask = 0x1,
     RsmiPwrProfPrstVideoMask = 0x2,
@@ -392,6 +392,6 @@ pub enum RsmiPowerProfilePresetMasks {
     RsmiPwrProfPrstComputeMask = 0x8,
     RsmiPwrProfPrstVrMask = 0x10,
     RsmiPwrProfPrst3dFullScrMask = 0x20,
-    RsmiPwrProfPrstBootupDefault = 0x40,
+    #[default] RsmiPwrProfPrstBootupDefault = 0x40,
     RsmiPwrProfPrstInvalid = 0xFFFFFFFFFFFFFFFF,
 }
