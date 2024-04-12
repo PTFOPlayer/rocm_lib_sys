@@ -187,7 +187,7 @@ mod test {
                 .rsmi_dev_power_profile_presets_get(0, 0, &mut profile as *mut RsmiPowerProfileStatus)
                 .try_err()?;
             
-            println!("power profile: {:?s}", profile.current);
+            println!("power profile: {:?}", profile.current);
             println!("bitmap: {:b}", profile.available_profiles)
 
         }
