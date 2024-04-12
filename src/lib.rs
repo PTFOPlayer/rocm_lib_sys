@@ -179,15 +179,17 @@ mod test {
             let mut rrsmi = RawRsmi::new(0)?;
 
             let mut profile = RsmiPowerProfileStatus::default();
-            println!("{:?}",rrsmi
-            .rsmi_dev_power_profile_set_v0(0, crate::bindings::RsmiPowerProfilePresetMasks::RsmiPwrProfPrstInvalid)
+            
+            println!("setting power profile: {:?}",rrsmi
+            .rsmi_dev_power_profile_set_v0(0, crate::bindings::RsmiPowerProfilePresetMasks::RsmiPwrProfPrstBootupDefault)
             .try_err());
             rrsmi
                 .rsmi_dev_power_profile_presets_get(0, 0, &mut profile as *mut RsmiPowerProfileStatus)
                 .try_err()?;
             
-            println!("power profile: {:?}", profile);
-  
+            println!("power profile: {:?s}", profile.current);
+            println!("bitmap: {:b}", profile.available_profiles)
+
         }
         Ok(())
     }

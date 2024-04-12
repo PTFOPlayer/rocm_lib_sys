@@ -376,9 +376,9 @@ pub struct RsmiFreqVoltRegion {
 #[repr(C)]
 #[derive(Debug, Default, Clone)]
 pub struct RsmiPowerProfileStatus {
-    available_profiles: u64,
-    current: RsmiPowerProfilePresetMasks,
-    num_profiles: u32,
+    pub available_profiles: u64,
+    pub current: RsmiPowerProfilePresetMasks,
+    pub num_profiles: u32,
 }
 
 #[allow(conflicting_repr_hints)]
