@@ -166,9 +166,6 @@ mod test {
                 .try_err()?;
 
             println!("metrics:{:?}", metrics);
-            for e in metrics.safety_padding {
-                println!("safety padding binary:{:x}", e)
-            }
         }
         Ok(())
     }

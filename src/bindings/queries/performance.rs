@@ -293,7 +293,10 @@ pub struct RsmiGpuMetrics {
     pub voltage_soc: u16,
     pub voltage_gfx: u16,
     pub voltage_mem: u16,
-
+    
+    // Throttle status
+    pub indep_throttle_status: u64,
+  
     // Power (Watts)
     pub current_socket_power: u16,
 
@@ -340,8 +343,6 @@ pub struct RsmiGpuMetrics {
 
     // PCIE NAK received accumulated count
     pub pcie_nak_rcvd_count_acc: u32,
-
-    pub safety_padding: [u128;2]
 }
 
 #[repr(C)]

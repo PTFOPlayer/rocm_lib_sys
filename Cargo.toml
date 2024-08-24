@@ -1,6 +1,6 @@
 [package]
 name = "rocm_smi_lib_sys"
-version = "0.2.2-patch1"
+version = "0.2.3"
 edition = "2021"
 license = "MIT OR Apache-2.0"
 authors = ["WhiskyAKM"]
@@ -10,11 +10,8 @@ categories = ["api-bindings", "external-ffi-bindings", "hardware-support"]
 keywords = ["radeon", "rsmi", "hip", "rocm", "gpu"]
 
 [dependencies]
-libc = "0.2.147"
-libloading = "0.8.1"
-
-[build-dependencies]
-cmake = "0.1.31"
+libc = "0.2.158"
+libloading = "0.8.5"
 
 [profile.dev]
 opt-level = 1
