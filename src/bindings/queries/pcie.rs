@@ -1,7 +1,7 @@
 use libloading::Symbol;
 
 use crate::{error::RocmErr, RawRsmi};
-pub const RSMI_MAX_NUM_FREQUENCIES: usize = 32;
+pub const RSMI_MAX_NUM_FREQUENCIES: usize = 33;
 
 impl RawRsmi {
     pub unsafe fn rsmi_dev_pci_bandwidth_get(
@@ -24,8 +24,8 @@ impl RawRsmi {
             };
         f(dv_ind, id)
     }
-    pub unsafe fn rsmi_topo_numa_affinity_get(&mut self, dv_ind: u32, numa: *mut u32) -> RocmErr {
-        let f: Symbol<unsafe extern "C" fn(u32, *mut u32) -> RocmErr> =
+    pub unsafe fn rsmi_topo_numa_affinity_get(&mut self, dv_ind: u32, numa: *mut i32) -> RocmErr {
+        let f: Symbol<unsafe extern "C" fn(u32, *mut i32) -> RocmErr> =
             match self.lib.get(b"rsmi_topo_numa_affinity_get") {
                 Ok(res) => res,
                 Err(err) => return err.into(),
