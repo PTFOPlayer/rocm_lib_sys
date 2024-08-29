@@ -62,16 +62,34 @@ impl RawRsmi {
 }
 
 #[repr(C)]
-#[derive(Default)]
 pub struct RsmiPcieBandwidth {
     pub transfer_rate: RsmiFrequencies,
     pub lanes: [u32; RSMI_MAX_NUM_FREQUENCIES],
 }
 
+impl Default for RsmiPcieBandwidth {
+    fn default() -> Self {
+        Self {
+            transfer_rate: Default::default(),
+            lanes: [0u32; RSMI_MAX_NUM_FREQUENCIES],
+        }
+    }
+}
+
 #[repr(C)]
-#[derive(Default)]
 pub struct RsmiFrequencies {
+    pub has_deep_sleep: bool,
     pub num_supported: u32,
     pub current: u32,
     pub frequency: [u64; RSMI_MAX_NUM_FREQUENCIES],
+}
+impl Default for RsmiFrequencies {
+    fn default() -> Self {
+        Self {
+            has_deep_sleep: Default::default(),
+            num_supported: Default::default(),
+            current: Default::default(),
+            frequency: [0u64; RSMI_MAX_NUM_FREQUENCIES],
+        }
+    }
 }
