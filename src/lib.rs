@@ -4,7 +4,7 @@ use libloading::{Library, Symbol};
 pub mod bindings;
 pub mod error;
 
-const PATH: &str = "/opt/rocm/lib/librocm_smi64.so";
+const OBJ: &str = "librocm_smi64.so";
 
 #[derive(Debug)]
 pub struct RawRsmi {
@@ -14,10 +14,10 @@ pub struct RawRsmi {
 
 impl RawRsmi {
     pub unsafe fn new(init_status: u32) -> Result<RawRsmi, RocmErr> {
-        let lib = Library::new(PATH)?;
+        let lib = Library::new(OBJ)?;
         let f: Symbol<unsafe extern "C" fn(u32) -> RocmErr> = lib.get(b"rsmi_init")?;
         f(init_status).try_err()?;
-        Ok(Self { path: PATH, lib })
+        Ok(Self { path: OBJ, lib })
     }
 
     pub unsafe fn with_path(init_status: u32, path: &'static str) -> Result<RawRsmi, RocmErr> {
