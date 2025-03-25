@@ -1,195 +1,141 @@
-use error::RocmErr;
-use libloading::{Library, Symbol};
-
 pub mod bindings;
 pub mod error;
 
-const PATH: &str = "/opt/rocm/lib/librocm_smi64.so";
-
-#[derive(Debug)]
-pub struct RawRsmi {
-    path: &'static str,
-    lib: Library,
-}
-
-impl RawRsmi {
-    pub unsafe fn new(init_status: u32) -> Result<RawRsmi, RocmErr> {
-        let lib = Library::new(PATH)?;
-        let f: Symbol<unsafe extern "C" fn(u32) -> RocmErr> = lib.get(b"rsmi_init")?;
-        f(init_status).try_err()?;
-        Ok(Self { path: PATH, lib })
-    }
-
-    pub unsafe fn with_path(init_status: u32, path: &'static str) -> Result<RawRsmi, RocmErr> {
-        let lib = Library::new(path)?;
-        let f: Symbol<unsafe extern "C" fn(u32) -> RocmErr> = lib.get(b"rsmi_init")?;
-        f(init_status).try_err()?;
-        Ok(Self { path, lib })
-    }
-
-    pub fn get_path(&self) -> &'static str {
-        self.path
-    }
-}
-
-impl Drop for RawRsmi {
-    fn drop(&mut self) {
-        unsafe {
-            let res: Result<Symbol<unsafe extern "C" fn() -> RocmErr>, RocmErr> = self
-                .lib
-                .get(b"rsmi_shut_down")
-                .map_err(|_| RocmErr::RsmiLibLoadingError);
-            match res {
-                Ok(f) => {
-                    let _res = f().try_err();
-                }
-                Err(_) => {}
-            }
-        }
-    }
-}
 
 #[cfg(test)]
 mod test {
-    use crate::{
-        bindings::{RsmiFwBlock, RsmiGpuMetrics, RsmiPowerProfileStatus, RsmiVersion},
-        error::RocmErr,
-        RawRsmi,
-    };
+    use crate::bindings::*;
     use std::mem::size_of;
 
     #[test]
-    fn name_brand_rev_sku_test() -> Result<(), RocmErr> {
+    fn name_brand_rev_sku_test() {
         unsafe {
-            let mut rrsmi = RawRsmi::new(0)?;
-
+            rsmi_init(0);
             let brand_buff = libc::malloc(size_of::<i8>() * 64).cast();
-            rrsmi.rsmi_dev_brand_get(0, brand_buff, 64).try_err()?;
+            assert_eq!(rsmi_dev_brand_get(0, brand_buff, 64), 0);
             let temp = std::ffi::CString::from_raw(brand_buff);
             println!("brand: {:?}", temp.to_string_lossy().to_string());
 
-            let name_buff = libc::malloc(size_of::<i8>() * 64).cast();
-            rrsmi.rsmi_dev_name_get(0, name_buff, 64).try_err()?;
+            let name_buff = libc::malloc(size_of::<i8>() * 128).cast();
+            assert_eq!(rsmi_dev_name_get(0, name_buff, 128), 0);
             let temp = std::ffi::CString::from_raw(name_buff);
             println!("name: {:?}", temp.to_string_lossy().to_string());
 
             let mut rev = 0u16;
-            rrsmi
-                .rsmi_dev_revision_get(0, &mut rev as *mut u16)
-                .try_err()?;
+
+            assert_eq!(rsmi_dev_revision_get(0, &mut rev as *mut u16), 0);
             println!("revision: 0x{:x?}", rev);
-
-            // sku function is probly broken
-            // let mut sku = 0u16;
-            // rrsmi.rsmi_dev_sku_get(0, &mut sku as * mut u16).try_err()?;
-            // println!("sku: {:?}", sku);
+            // not supported on rx 7600
+            // let sku = libc::malloc(size_of::<i8>() * 128).cast();
+            // assert_eq!(rsmi_dev_sku_get(0, sku), 0);
+            // let temp = std::ffi::CString::from_raw(sku);
+            // println!("sku: {:?}", temp.to_string_lossy().to_string());
         }
 
-        Ok(())
     }
 
-    #[test]
-    fn processes() -> Result<(), RocmErr> {
-        unsafe {
-            let mut rrsmi = RawRsmi::new(0)?;
+    // #[test]
+    // fn processes() -> Result<(), RocmErr> {
+    //     unsafe {
+    //         let mut rrsmi = RawRsmi::new(0)?;
 
-            let procs = vec![].as_mut_ptr();
-            let mut num_items = 0u32;
-            rrsmi
-                .rsmi_compute_process_info_get(procs, &mut num_items as *mut u32)
-                .try_err()?;
+    //         let procs = vec![].as_mut_ptr();
+    //         let mut num_items = 0u32;
+    //         rrsmi
+    //             .rsmi_compute_process_info_get(procs, &mut num_items as *mut u32)
+    //             .try_err()?;
 
-            let slice = std::slice::from_raw_parts_mut(procs, num_items as usize);
-            println!("num procs:{}", num_items);
-            for e in slice {
-                println!("{:?}", e);
-            }
-        }
-        Ok(())
-    }
+    //         let slice = std::slice::from_raw_parts_mut(procs, num_items as usize);
+    //         println!("num procs:{}", num_items);
+    //         for e in slice {
+    //             println!("{:?}", e);
+    //         }
+    //     }
+    //     Ok(())
+    // }
 
-    #[test]
-    fn firmware() -> Result<(), RocmErr> {
-        unsafe {
-            let mut rrsmi = RawRsmi::new(0)?;
+    // #[test]
+    // fn firmware() -> Result<(), RocmErr> {
+    //     unsafe {
+    //         let mut rrsmi = RawRsmi::new(0)?;
 
-            let mut rsmi_v: RsmiVersion = RsmiVersion {
-                major: 0,
-                minor: 0,
-                patch: 0,
-                build: &mut 0i8,
-            };
+    //         let mut rsmi_v: RsmiVersion = RsmiVersion {
+    //             major: 0,
+    //             minor: 0,
+    //             patch: 0,
+    //             build: &mut 0i8,
+    //         };
 
-            rrsmi
-                .rsmi_version_get(&mut rsmi_v as *mut RsmiVersion)
-                .try_err()?;
-            println!("Rsmi version: {:?}", rsmi_v);
+    //         rrsmi
+    //             .rsmi_version_get(&mut rsmi_v as *mut RsmiVersion)
+    //             .try_err()?;
+    //         println!("Rsmi version: {:?}", rsmi_v);
 
-            let mut v = 0u64;
-            for item in RsmiFwBlock::enum_iterator() {
-                match rrsmi
-                    .rsmi_dev_firmware_version_get(0, item, &mut v as *mut u64)
-                    .try_err()
-                {
-                    Ok(_) => println!("firmware version {:?}:{}", item, v),
-                    Err(_) => {}
-                }
-            }
-        }
+    //         let mut v = 0u64;
+    //         for item in RsmiFwBlock::enum_iterator() {
+    //             match rrsmi
+    //                 .rsmi_dev_firmware_version_get(0, item, &mut v as *mut u64)
+    //                 .try_err()
+    //             {
+    //                 Ok(_) => println!("firmware version {:?}:{}", item, v),
+    //                 Err(_) => {}
+    //             }
+    //         }
+    //     }
 
-        Ok(())
-    }
+    //     Ok(())
+    // }
 
-    #[test]
-    fn activity_test() -> Result<(), RocmErr> {
-        unsafe {
-            let mut rrsmi = RawRsmi::new(0)?;
+    // #[test]
+    // fn activity_test() -> Result<(), RocmErr> {
+    //     unsafe {
+    //         let mut rrsmi = RawRsmi::new(0)?;
 
-            let mut acc = 0u16;
-            rrsmi
-                .rsmi_dev_activity_avg_mm_get(0, &mut acc as *mut u16)
-                .try_err()?;
+    //         let mut acc = 0u16;
+    //         rrsmi
+    //             .rsmi_dev_activity_avg_mm_get(0, &mut acc as *mut u16)
+    //             .try_err()?;
 
-            println!("avg acc:{}", acc);
-        }
-        Ok(())
-    }
+    //         println!("avg acc:{}", acc);
+    //     }
+    //     Ok(())
+    // }
 
-    #[test]
-    fn gpu_metrics_test() -> Result<(), RocmErr> {
-        unsafe {
-            let mut rrsmi = RawRsmi::new(0)?;
+    // #[test]
+    // fn gpu_metrics_test() -> Result<(), RocmErr> {
+    //     unsafe {
+    //         let mut rrsmi = RawRsmi::new(0)?;
 
-            let mut metrics = RsmiGpuMetrics::default();
-            rrsmi
-                .rsmi_dev_gpu_metrics_info_get(0, &mut metrics as *mut RsmiGpuMetrics)
-                .try_err()?;
+    //         let mut metrics = RsmiGpuMetrics::default();
+    //         rrsmi
+    //             .rsmi_dev_gpu_metrics_info_get(0, &mut metrics as *mut RsmiGpuMetrics)
+    //             .try_err()?;
 
-            println!("metrics:{:?}", metrics);
-        }
-        Ok(())
-    }
+    //         println!("metrics:{:?}", metrics);
+    //     }
+    //     Ok(())
+    // }
 
-    #[test]
-    fn power_profile_test() -> Result<(), RocmErr> {
-        unsafe {
-            let mut rrsmi = RawRsmi::new(0)?;
+    // #[test]
+    // fn power_profile_test() -> Result<(), RocmErr> {
+    //     unsafe {
+    //         let mut rrsmi = RawRsmi::new(0)?;
 
-            let mut profile = RsmiPowerProfileStatus::default();
-            
-            println!("setting power profile: {:?}",rrsmi
-            .rsmi_dev_power_profile_set_v0(0, crate::bindings::RsmiPowerProfilePresetMasks::RsmiPwrProfPrstBootupDefault)
-            .try_err());
-            rrsmi
-                .rsmi_dev_power_profile_presets_get(0, 0, &mut profile as *mut RsmiPowerProfileStatus)
-                .try_err()?;
-            
-            println!("power profile: {:?}", profile.current);
-            println!("bitmap: {:b}", profile.available_profiles)
+    //         let mut profile = RsmiPowerProfileStatus::default();
 
-        }
-        Ok(())
-    }
+    //         println!("setting power profile: {:?}",rrsmi
+    //         .rsmi_dev_power_profile_set_v0(0, crate::bindings::RsmiPowerProfilePresetMasks::RsmiPwrProfPrstBootupDefault)
+    //         .try_err());
+    //         rrsmi
+    //             .rsmi_dev_power_profile_presets_get(0, 0, &mut profile as *mut RsmiPowerProfileStatus)
+    //             .try_err()?;
+
+    //         println!("power profile: {:?}", profile.current);
+    //         println!("bitmap: {:b}", profile.available_profiles)
+
+    //     }
+    //     Ok(())
+    // }
     // #[test]
     // fn bios() -> Result<(), RocmErr> {
     //     unsafe {

@@ -1,2 +1,0 @@
-mod pcie;
-mod power;
