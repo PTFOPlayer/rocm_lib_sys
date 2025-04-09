@@ -1,17 +1,16 @@
 [package]
 name = "rocm_smi_lib_sys"
-version = "0.2.4"
+version = "0.3.0"
 edition = "2021"
 license = "MIT OR Apache-2.0"
 authors = ["WhiskyAKM"]
 description = "bindings for rocm_smi_lib"
-repository = "https://github.com/PTFOPlayer/rocm_smi_lib"
+repository = "https://github.com/PTFOPlayer/rocm_smi_lib_rs"
 categories = ["api-bindings", "external-ffi-bindings", "hardware-support"]
 keywords = ["radeon", "rsmi", "hip", "rocm", "gpu"]
 
 [dependencies]
 libc = "0.2.158"
-libloading = "0.8.5"
 
 [build-dependencies]
 bindgen = "0.69.0"
