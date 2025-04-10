@@ -4,10 +4,10 @@ fn main() {
     println!("cargo:rustc-link-lib=rocm_smi64");
 
     let bindings = bindgen::Builder::default()
-        .header("rocm_smi.h")
+        .header("./rocm_smi.h")
         .parse_callbacks(Box::new(bindgen::CargoCallbacks::new()))
         .generate()
-        .expect("Unable to generate bindings");
+        .unwrap();
 
     let out_path = PathBuf::from("./src");
     bindings

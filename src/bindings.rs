@@ -3162,7 +3162,6 @@ pub const kfd_smi_event_KFD_SMI_EVENT_VMFAULT: kfd_smi_event = 1;
 pub const kfd_smi_event_KFD_SMI_EVENT_THERMAL_THROTTLE: kfd_smi_event = 2;
 pub const kfd_smi_event_KFD_SMI_EVENT_GPU_PRE_RESET: kfd_smi_event = 3;
 pub const kfd_smi_event_KFD_SMI_EVENT_GPU_POST_RESET: kfd_smi_event = 4;
-pub const kfd_smi_event_KFD_SMI_EVENT_RING_HANG: kfd_smi_event = 5;
 pub type kfd_smi_event = ::std::os::raw::c_uint;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
